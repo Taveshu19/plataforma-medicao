@@ -586,7 +586,7 @@ describe('escopo de acesso por obra', () => {
       .from('projects')
       .select('name, unit_label')
       .order('name')
-    expect(data!.map((p) => p.unit_label)).toEqual(['apartamento', 'casa'])
+    expect(data!.map((p) => p.unit_label)).toEqual(['casa', 'apartamento'])
   })
 
   it('a obra nasce com tres niveis de aprovacao', async () => {
@@ -957,7 +957,7 @@ git commit -m "feat: contratos, aditivos, itens e conversao percentual por local
 ### Task 5: Períodos, medições e itens de medição
 
 **Files:**
-- Create: `supabase/migrations/004_medicoes.sql`
+- Create: `supabase/migrations/005_medicoes.sql`
 - Create: `tests/medicoes.test.ts`
 
 **Interfaces:**
@@ -971,7 +971,7 @@ git commit -m "feat: contratos, aditivos, itens e conversao percentual por local
 
 - [ ] **Step 1: Escrever a migration**
 
-`supabase/migrations/004_medicoes.sql`:
+`supabase/migrations/005_medicoes.sql`:
 
 ```sql
 create type measurement_status as enum (
@@ -1070,7 +1070,7 @@ create policy measurement_items_select on measurement_items for select
 - [ ] **Step 2: Aplicar a migration**
 
 Run: `npx supabase db reset`
-Expected: aplica 001 a 004 sem erro.
+Expected: aplica 001 a 005 sem erro.
 
 - [ ] **Step 3: Extrair o helper de cenário**
 
@@ -1248,7 +1248,7 @@ Expected: PASS, 5 testes.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add supabase/migrations/004_medicoes.sql tests/medicoes.test.ts tests/helpers/scenario.ts
+git add supabase/migrations/005_medicoes.sql tests/medicoes.test.ts tests/helpers/scenario.ts
 git commit -m "feat: periodos, medicoes, itens de medicao e protocolo"
 ```
 
@@ -1261,7 +1261,7 @@ O coração do produto. Uma medição consome saldo quando está em análise ou 
 O parâmetro `p_exclude_measurement` existe porque, ao validar um item, a própria medição não pode contar contra si mesma.
 
 **Files:**
-- Create: `supabase/migrations/005_saldo.sql`
+- Create: `supabase/migrations/006_saldo.sql`
 - Create: `tests/saldo.test.ts`
 
 **Interfaces:**
@@ -1428,7 +1428,7 @@ Expected: FAIL com `function contract_item_balance(uuid, uuid) does not exist`.
 
 - [ ] **Step 3: Escrever a migration**
 
-`supabase/migrations/005_saldo.sql`:
+`supabase/migrations/006_saldo.sql`:
 
 ```sql
 /* Saldo de um item de contrato.
@@ -1497,7 +1497,7 @@ Expected: PASS, 14 testes.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add supabase/migrations/005_saldo.sql tests/saldo.test.ts
+git add supabase/migrations/006_saldo.sql tests/saldo.test.ts
 git commit -m "feat: regra de saldo calculada e bloqueio por trigger"
 ```
 
@@ -1508,7 +1508,7 @@ git commit -m "feat: regra de saldo calculada e bloqueio por trigger"
 Os níveis vêm de `approval_levels`, uma linha por etapa da cadeia. Trocar uma obra de três para quatro níveis é inserir uma linha, não mexer em código.
 
 **Files:**
-- Create: `supabase/migrations/006_fluxo.sql`
+- Create: `supabase/migrations/007_fluxo.sql`
 - Create: `tests/fluxo.test.ts`
 
 **Interfaces:**
@@ -1674,7 +1674,7 @@ Expected: FAIL com `relation "approval_levels" does not exist`.
 
 - [ ] **Step 3: Escrever a migration**
 
-`supabase/migrations/006_fluxo.sql`:
+`supabase/migrations/007_fluxo.sql`:
 
 ```sql
 create table approval_levels (
@@ -1807,7 +1807,7 @@ Expected: PASS, 11 testes.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add supabase/migrations/006_fluxo.sql tests/fluxo.test.ts
+git add supabase/migrations/007_fluxo.sql tests/fluxo.test.ts
 git commit -m "feat: maquina de estados e niveis de aprovacao configuraveis"
 ```
 
@@ -1818,7 +1818,7 @@ git commit -m "feat: maquina de estados e niveis de aprovacao configuraveis"
 Grava toda mudança relevante com valor anterior e novo. O teste mais importante é o último: `qty_requested` sobrevive intacta a qualquer número de ajustes.
 
 **Files:**
-- Create: `supabase/migrations/007_auditoria.sql`
+- Create: `supabase/migrations/008_auditoria.sql`
 - Create: `tests/auditoria.test.ts`
 
 **Interfaces:**
@@ -1952,7 +1952,7 @@ Expected: FAIL com `relation "audit_log" does not exist`.
 
 - [ ] **Step 3: Escrever a migration**
 
-`supabase/migrations/007_auditoria.sql`:
+`supabase/migrations/008_auditoria.sql`:
 
 ```sql
 create table audit_log (
@@ -2091,7 +2091,7 @@ Expected: PASS em todos os arquivos.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add supabase/migrations/007_auditoria.sql tests/auditoria.test.ts
+git add supabase/migrations/008_auditoria.sql tests/auditoria.test.ts
 git commit -m "feat: trilha de auditoria de ajustes, aprovacoes e devolucoes"
 ```
 
@@ -2102,7 +2102,7 @@ git commit -m "feat: trilha de auditoria de ajustes, aprovacoes e devolucoes"
 A reabertura é por empreiteiro. Mudar `closes_at` do período reabriria para os 18 empreiteiros da obra — por isso vira registro próprio.
 
 **Files:**
-- Create: `supabase/migrations/008_reabertura.sql`
+- Create: `supabase/migrations/009_reabertura.sql`
 - Create: `tests/reabertura.test.ts`
 
 **Interfaces:**
@@ -2286,7 +2286,7 @@ Expected: FAIL com `function is_period_open(uuid, uuid) does not exist`.
 
 - [ ] **Step 3: Escrever a migration**
 
-`supabase/migrations/008_reabertura.sql`:
+`supabase/migrations/009_reabertura.sql`:
 
 ```sql
 create table period_reopenings (
@@ -2421,7 +2421,7 @@ Expected: PASS em todos os arquivos, incluindo os 7 novos de reabertura.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add supabase/migrations/008_reabertura.sql tests/reabertura.test.ts tests/helpers/scenario.ts
+git add supabase/migrations/009_reabertura.sql tests/reabertura.test.ts tests/helpers/scenario.ts
 git commit -m "feat: janela de medicao e reabertura por empreiteiro"
 ```
 
@@ -2430,7 +2430,7 @@ git commit -m "feat: janela de medicao e reabertura por empreiteiro"
 ### Task 10: Anexos, nota fiscal e buckets
 
 **Files:**
-- Create: `supabase/migrations/009_anexos_nf.sql`
+- Create: `supabase/migrations/010_anexos_nf.sql`
 - Create: `tests/nf.test.ts`
 
 **Interfaces:**
@@ -2586,7 +2586,7 @@ Expected: FAIL com `function measurement_total(uuid, boolean) does not exist`.
 
 - [ ] **Step 3: Escrever a migration**
 
-`supabase/migrations/009_anexos_nf.sql`:
+`supabase/migrations/010_anexos_nf.sql`:
 
 ```sql
 alter table projects add column invoice_tolerance numeric(14,4) not null default 0;
@@ -2707,7 +2707,7 @@ end $$;
 
 - [ ] **Step 4: Criar os buckets de storage**
 
-`supabase/migrations/010_buckets.sql`:
+`supabase/migrations/011_buckets.sql`:
 
 ```sql
 insert into storage.buckets (id, name, public)
@@ -2739,7 +2739,7 @@ Expected: PASS, 8 testes.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add supabase/migrations/009_anexos_nf.sql supabase/migrations/010_buckets.sql tests/nf.test.ts
+git add supabase/migrations/010_anexos_nf.sql supabase/migrations/011_buckets.sql tests/nf.test.ts
 git commit -m "feat: anexos, nota fiscal com tolerancia e buckets isolados"
 ```
 
@@ -3047,7 +3047,7 @@ git commit -m "feat: seed de demonstracao com historico e periodo aberto"
 ## Verificação final
 
 - [ ] `npm run test:all` passa inteiro
-- [ ] `npx supabase db reset` aplica as 10 migrations sem erro
+- [ ] `npx supabase db reset` aplica as 11 migrations sem erro
 - [ ] Toda tabela de negócio tem RLS habilitada:
 
 ```bash
