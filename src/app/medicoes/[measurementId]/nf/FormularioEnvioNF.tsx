@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { createBrowserClient } from '@supabase/ssr'
-import { enviarNotaFiscalAction } from '@/app/faturamento/acoes'
+import { enviarNotaFiscalAction, uploadNotaFiscalPdfAction } from '@/app/faturamento/acoes'
 
 interface FormularioEnvioNFProps {
   measurementId: string
@@ -68,23 +67,14 @@ export function FormularioEnvioNF({
       let pdfPath: string | null = null
 
       if (arquivo) {
-        const supabase = createBrowserClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        )
+        const formData = new FormData()
+        formData.append('file', arquivo)
+        const uploadRes = await uploadNotaFiscalPdfAction(companyId, measurementId, formData)
 
-        const sanitizedName = arquivo.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-        const caminhoArquivo = `${companyId}/notas/${measurementId}/${Date.now()}-${sanitizedName}`
-
-        const { error: uploadError } = await supabase.storage
-          .from('notas-fiscais')
-          .upload(caminhoArquivo, arquivo)
-
-        if (uploadError) {
-          // Se falhar o upload do arquivo, prossegue ou avisa
-          console.error('Erro no upload do PDF:', uploadError)
-        } else {
-          pdfPath = caminhoArquivo
+        if (uploadRes.error) {
+          console.error('Erro no upload do PDF:', uploadRes.error)
+        } else if (uploadRes.path) {
+          pdfPath = uploadRes.path
         }
       }
 

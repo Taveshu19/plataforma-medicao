@@ -7,7 +7,7 @@ export default defineConfig({
   retries: 0,
   reporter: 'list',
   use: {
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: process.env.BASE_URL || 'http://127.0.0.1:3000',
     trace: 'retain-on-failure',
   },
   projects: [
@@ -16,7 +16,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev',
     url: 'http://127.0.0.1:3000/entrar',
-    reuseExistingServer: false,
+    reuseExistingServer: true,
     timeout: 120_000,
   },
 })

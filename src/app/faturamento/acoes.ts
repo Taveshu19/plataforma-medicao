@@ -19,6 +19,49 @@ export interface FaturamentoResultado {
 }
 
 /**
+ * Upload de arquivo PDF de Nota Fiscal via Server Action
+ */
+export async function uploadNotaFiscalPdfAction(
+  companyId: string,
+  measurementId: string,
+  formData: FormData,
+): Promise<{ path?: string; error?: string }> {
+  const file = formData.get('file') as File | null
+  if (!file || file.size === 0) {
+    return { path: undefined }
+  }
+
+  const supabase = await createServerSupabase()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Usuário não autenticado.' }
+  }
+
+  const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+  const caminhoArquivo = `${companyId}/notas/${measurementId}/${Date.now()}-${sanitizedName}`
+  const bytes = await file.arrayBuffer()
+  const buffer = Buffer.from(bytes)
+
+  const { error: uploadError } = await supabase.storage
+    .from('notas-fiscais')
+    .upload(caminhoArquivo, buffer, {
+      contentType: file.type || 'application/pdf',
+      upsert: true,
+    })
+
+  if (uploadError) {
+    console.error('Erro no upload do PDF no servidor:', uploadError)
+    return { error: uploadError.message }
+  }
+
+  return { path: caminhoArquivo }
+}
+
+
+/**
  * Empreiteiro submete a Nota Fiscal para a medição aprovada.
  */
 export async function enviarNotaFiscalAction(
