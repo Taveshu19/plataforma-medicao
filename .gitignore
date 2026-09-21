@@ -50,3 +50,6 @@ next-env.d.ts
 /playwright-report
 /blob-report
 
+
+# diretorio de trabalho dos agentes
+.superpowers/
