@@ -1,3 +1,5 @@
+Leia [as regras comuns do Orca](../../AGENTS.md) uma vez por sessão, se ainda não estiverem no contexto. Leia só os documentos necessários à tarefa; preserve regras específicas abaixo.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
