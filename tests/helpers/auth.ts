@@ -4,11 +4,11 @@ import { sql } from './db'
 
 config({ path: '.env.test' })
 
-const URL = process.env.API_URL ?? 'http://127.0.0.1:54321'
+const SUPABASE_URL = process.env.API_URL ?? 'http://127.0.0.1:54321'
 const ANON = process.env.ANON_KEY!
 const SERVICE = process.env.SERVICE_ROLE_KEY!
 
-export const admin = createClient(URL, SERVICE, {
+export const admin = createClient(SUPABASE_URL, SERVICE, {
   auth: { autoRefreshToken: false, persistSession: false },
 })
 
@@ -39,7 +39,7 @@ export async function createUser(
     [userId, companyId, role],
   )
 
-  const client = createClient(URL, ANON, {
+  const client = createClient(SUPABASE_URL, ANON, {
     auth: { autoRefreshToken: false, persistSession: false },
   })
   const signIn = await client.auth.signInWithPassword({ email, password })
@@ -57,7 +57,13 @@ export async function createCompany(name: string): Promise<string> {
 }
 
 function isLocalUrl(value: string): boolean {
-  return value.includes('127.0.0.1') || value.includes('localhost')
+  try {
+    const { hostname } = new URL(value)
+    const host = hostname.toLowerCase().replace(/^\[|\]$/g, '')
+    return host === 'localhost' || host === '127.0.0.1' || host === '::1'
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -66,7 +72,7 @@ function isLocalUrl(value: string): boolean {
  */
 function assertLocalStack(): void {
   const dbUrl = process.env.DB_URL ?? ''
-  const apiUrl = URL
+  const apiUrl = SUPABASE_URL
 
   if (!isLocalUrl(dbUrl) || !isLocalUrl(apiUrl)) {
     throw new Error(
