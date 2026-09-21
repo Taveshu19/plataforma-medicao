@@ -5,6 +5,7 @@ import {
   listarLocaisMedicao,
   listarServicosLocal,
 } from '@/lib/medicao/dados'
+import { listarAnexos } from '@/app/medicao/anexos'
 import { FormLocal } from './FormLocal'
 
 interface PageProps {
@@ -29,6 +30,7 @@ export default async function LocalMedicaoPage({ params }: PageProps) {
   if (!localInfo) redirect('/medicao')
 
   const servicos = await listarServicosLocal(rascunho.id, unitId)
+  const anexos = await listarAnexos(rascunho.id)
 
   return (
     <main className="mx-auto w-full max-w-md px-5 pb-28 pt-6">
@@ -38,6 +40,7 @@ export default async function LocalMedicaoPage({ params }: PageProps) {
         unitName={localInfo.unitName}
         stageName={localInfo.stageName}
         servicos={servicos}
+        anexos={anexos}
       />
     </main>
   )

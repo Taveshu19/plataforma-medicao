@@ -8,6 +8,8 @@ import {
 import { competenciaPorExtenso } from '@/app/formato'
 import { TabelaAjustes } from './TabelaAjustes'
 import { LinhaDoTempoAuditoria } from './components/LinhaDoTempoAuditoria'
+import { EvidenciasRecebidas } from './components/EvidenciasRecebidas'
+import { listarAnexos } from '@/app/medicao/anexos'
 
 interface PageProps {
   params: Promise<{
@@ -31,6 +33,13 @@ export default async function AnaliseDetalhePage({ params }: PageProps) {
   }
 
   const eventosAuditoria = await obterLinhaDoTempoAuditoria(measurementId)
+  const anexos = await listarAnexos(measurementId)
+
+  // Mapa de item de contrato para nome do servico, para a legenda das fotos.
+  const nomePorItem: Record<string, string> = {}
+  for (const item of dados.itens) {
+    nomePorItem[item.contractItemId] = item.serviceName
+  }
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 pb-32 pt-6">
@@ -94,6 +103,8 @@ export default async function AnaliseDetalhePage({ params }: PageProps) {
         itens={dados.itens}
         totalRequested={dados.totalRequested}
       />
+
+      <EvidenciasRecebidas anexos={anexos} nomePorItem={nomePorItem} />
 
       <LinhaDoTempoAuditoria eventos={eventosAuditoria} />
     </main>

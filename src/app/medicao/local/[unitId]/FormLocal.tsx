@@ -8,6 +8,7 @@ import { LinhaServico } from './LinhaServico'
 import { validateQty, calcSubtotal } from '@/app/medicao/conversao'
 import { formatarReais } from '@/app/formato'
 import { salvarMedicaoLocal } from '@/app/medicao/acoes'
+import type { AnexoMedicao } from '@/app/medicao/anexos'
 
 interface FormLocalProps {
   measurementId: string
@@ -15,6 +16,7 @@ interface FormLocalProps {
   unitName: string
   stageName: string
   servicos: ServicoLocal[]
+  anexos: AnexoMedicao[]
 }
 
 export function FormLocal({
@@ -22,6 +24,7 @@ export function FormLocal({
   unitName,
   stageName,
   servicos,
+  anexos,
 }: FormLocalProps) {
   const router = useRouter()
   const [salvando, setSalvando] = useState(false)
@@ -34,6 +37,18 @@ export function FormLocal({
     }
     return inicial
   })
+
+  const [observacoes, setObservacoes] = useState<Record<string, string>>(() => {
+    const inicial: Record<string, string> = {}
+    for (const s of servicos) {
+      inicial[s.contractItemId] = s.notes ?? ''
+    }
+    return inicial
+  })
+
+  const handleUpdateObservacao = (contractItemId: string, texto: string) => {
+    setObservacoes((prev) => ({ ...prev, [contractItemId]: texto }))
+  }
 
   const handleUpdateQty = (contractItemId: string, novaQty: number) => {
     setQuantidades((prev) => ({
@@ -66,6 +81,8 @@ export function FormLocal({
     const itens = servicos.map((s) => ({
       contractItemId: s.contractItemId,
       qtyRequested: quantidades[s.contractItemId] ?? 0,
+      // Observacao em branco vira null: texto vazio no banco nao significa nada.
+      notes: (observacoes[s.contractItemId] ?? '').trim() || null,
     }))
 
     const resultado = await salvarMedicaoLocal(measurementId, itens)
@@ -115,6 +132,12 @@ export function FormLocal({
             servico={servico}
             qty={quantidades[servico.contractItemId] ?? 0}
             onChangeQty={(novaQty) => handleUpdateQty(servico.contractItemId, novaQty)}
+            measurementId={measurementId}
+            observacao={observacoes[servico.contractItemId] ?? ''}
+            onChangeObservacao={(texto) =>
+              handleUpdateObservacao(servico.contractItemId, texto)
+            }
+            anexos={anexos.filter((a) => a.contractItemId === servico.contractItemId)}
             disabled={salvando}
           />
         ))}

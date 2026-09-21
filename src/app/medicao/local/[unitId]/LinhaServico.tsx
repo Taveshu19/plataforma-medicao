@@ -9,11 +9,17 @@ import {
   calcSubtotal,
 } from '@/app/medicao/conversao'
 import { formatarReais } from '@/app/formato'
+import { EvidenciaServico } from './EvidenciaServico'
+import type { AnexoMedicao } from '@/app/medicao/anexos'
 
 interface LinhaServicoProps {
   servico: ServicoLocal
   qty: number
   onChangeQty: (novaQty: number) => void
+  measurementId: string
+  observacao: string
+  onChangeObservacao: (texto: string) => void
+  anexos: AnexoMedicao[]
   disabled?: boolean
 }
 
@@ -21,6 +27,10 @@ export function LinhaServico({
   servico,
   qty,
   onChangeQty,
+  measurementId,
+  observacao,
+  onChangeObservacao,
+  anexos,
   disabled = false,
 }: LinhaServicoProps) {
   const [modo, setModo] = useState<'qty' | 'percent'>('qty')
@@ -206,6 +216,15 @@ export function LinhaServico({
           {formatarReais(subtotal)}
         </span>
       </div>
+
+      <EvidenciaServico
+        measurementId={measurementId}
+        contractItemId={servico.contractItemId}
+        observacao={observacao}
+        onChangeObservacao={onChangeObservacao}
+        anexos={anexos}
+        disabled={disabled}
+      />
     </article>
   )
 }
