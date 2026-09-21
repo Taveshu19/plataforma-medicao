@@ -107,6 +107,37 @@ export default async function HistoricoMedicoesPage() {
                   )}
                 </div>
 
+                {/* Ação para medição aprovada (enviar Nota Fiscal) */}
+                {med.status === 'APROVADA' && (
+                  <div className="mt-3">
+                    <Link
+                      href={`/medicoes/${med.id}/nf`}
+                      className="flex w-full items-center justify-center rounded-xl bg-emerald-600 px-3 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700"
+                    >
+                      Emitir / Anexar Nota Fiscal
+                    </Link>
+                  </div>
+                )}
+
+                {/* Mensagens de status fiscal */}
+                {med.status === 'NF_ENVIADA' && (
+                  <div className="mt-3 rounded-xl bg-indigo-50 p-2.5 text-center text-xs font-medium text-indigo-700 ring-1 ring-indigo-200">
+                    Nota Fiscal enviada • Em conferência pelo financeiro
+                  </div>
+                )}
+
+                {med.status === 'NF_APROVADA' && (
+                  <div className="mt-3 rounded-xl bg-teal-50 p-2.5 text-center text-xs font-medium text-teal-700 ring-1 ring-teal-200">
+                    Nota Fiscal aprovada • Aguardando liquidação/pagamento
+                  </div>
+                )}
+
+                {med.status === 'PAGA' && (
+                  <div className="mt-3 rounded-xl bg-emerald-50 p-2.5 text-center text-xs font-semibold text-emerald-800 ring-1 ring-emerald-200">
+                    ✓ Pagamento realizado com sucesso
+                  </div>
+                )}
+
                 {/* Bloco de alerta para medição devolvida */}
                 {devolvida && (
                   <div className="mt-3 rounded-xl bg-rose-50 p-3 ring-1 ring-rose-200">
