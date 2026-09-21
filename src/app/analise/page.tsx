@@ -1,10 +1,12 @@
 import Link from 'next/link'
+import { contarNaoLidos } from '@/lib/notificacoes/dados'
 import { redirect } from 'next/navigation'
 import { obterPerfilUsuario, listarMedicoesPorStatus } from '@/lib/aprovacao/dados'
 import { TabelaMedicoes } from './components/TabelaMedicoes'
 
 export default async function PainelAnalisePage() {
   const perfil = await obterPerfilUsuario()
+  const avisosNaoLidos = await contarNaoLidos()
   if (!perfil) redirect('/entrar')
 
   if (!perfil.isConstrutora) {
@@ -36,6 +38,18 @@ export default async function PainelAnalisePage() {
         </div>
 
         <div className="flex items-center gap-4">
+          <Link
+            href="/notificacoes"
+            className="relative rounded-xl bg-white px-3 py-2 text-xs font-semibold text-slate-700 ring-1 ring-slate-300 transition hover:ring-slate-400"
+          >
+            Avisos
+            {avisosNaoLidos > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-900 px-1 text-[10px] font-bold text-white">
+                {avisosNaoLidos > 9 ? '9+' : avisosNaoLidos}
+              </span>
+            )}
+          </Link>
+
           <Link
             href="/analise/prazos"
             className="rounded-xl bg-white px-3 py-2 text-xs font-semibold text-slate-700 ring-1 ring-slate-300 transition hover:ring-slate-400"
