@@ -161,7 +161,7 @@ Cenário ponta a ponta integrando o empreiteiro e a equipe da engenharia.
 7. Reenvia a medição.
 8. Engenharia aprova -> avança de nível.
 
-- [ ] **Step 1: Escrever teste E2E `e2e/aprovacao.spec.ts`**
-- [ ] **Step 2: Executar com `npx playwright test`**
-- [ ] **Step 3: Executar `npm run test:all` e `tsc --noEmit`**
-- [ ] **Step 4: Commit e atualização do HANDOFF.md**
+- [x] **Step 1: Escrever teste E2E `e2e/aprovacao.spec.ts`**
+- [x] **Step 2: Executar com `npx playwright test`**
+- [x] **Step 3: Executar `npm run test:all` e `tsc --noEmit`**
+- [x] **Step 4: Commit e atualização do HANDOFF.md**

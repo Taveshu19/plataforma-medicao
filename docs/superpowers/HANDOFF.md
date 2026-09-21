@@ -16,9 +16,9 @@
 
 ## 2. Estado exato
 
-**Branch:** `master`. Árvore limpa. **36 commits.**
-**Testes:** 156 na suíte principal + 12 no seed = **168 passando**. 6 testes E2E do Playwright passando em perfil celular real (Pixel 7). `tsc --noEmit` limpo.
-**Migrations:** 001 a 017. A próxima livre é a `018`.
+**Branch:** `master`. Árvore limpa. **44 commits.**
+**Testes:** 165 na suíte principal + 12 no seed = **177 passando**. 7 testes E2E do Playwright passando em perfil celular real (Pixel 7). `npm run build` e `npx tsc --noEmit` limpos.
+**Migrations:** 001 a 018. A próxima livre é a `019`.
 
 ### Plano 1 — Fundação de dados e regras: ✅ COMPLETO
 12 migrations, RLS de leitura em tudo, regra de saldo, máquina de estados configurável, auditoria, reabertura por empreiteiro, NF com tolerância, seed com obra de 20 casas.
@@ -38,16 +38,27 @@ Clientes Supabase e proxy de sessão, usuários de demonstração no seed, resum
 | 6 — Revisão e envio formal com protocolo | ✅ completa (`/medicao/revisao`, modal e protocolo sequencial) | `6242614` |
 | 7 — Suíte E2E móvel e protocolo resiliente | ✅ completa (migration 017, Playwright Pixel 7 ponta a ponta) | `2ac477b` |
 
+### Plano 4 — Painel de Análise e Aprovação da Engenharia e Histórico do Empreiteiro: ✅ COMPLETO (6 de 6)
+
+| Task | Estado | Commits |
+|---|---|---|
+| 1 — Permissões de aprovação/devolução e ajuste no banco | ✅ completa (migration 018, RPCs de aprovação, devolução com motivo, ajuste de itens e auditoria) | `cf67b9c` |
+| 2 — Helpers de dados e Server Actions de aprovação | ✅ completa (`src/lib/aprovacao/dados.ts`, `src/app/analise/acoes.ts`) | `e9faf68` |
+| 3 — Painel desktop de medições recebidas (`/analise`) | ✅ completa (redirecionamento por perfil, busca em tempo real, cards de medições pendentes) | `e04677b` |
+| 4 — Tela de conferência, rebalanceamento de itens e devolução | ✅ completa (`/analise/[measurementId]`, edição de `qty_approved`, validação de saldo ao vivo, modal com motivo obrigatório) | `3dd5df1` |
+| 5 — Tela de histórico do empreiteiro com motivo de devolução | ✅ completa (`/medicoes`, link direto na Home, badges de status, motivo da devolução destacado com link para correção) | `740eca7` |
+| 6 — Suíte E2E do ciclo completo de aprovação e validação | ✅ completa (`e2e/aprovacao.spec.ts`, helper de isolamento `e2e/helpers/db.ts`, 7/7 testes E2E verdes) | `05f2377` |
+
 ---
 
-## 3. Próximos Passos (Avançar para o Plano 4)
+## 3. Próximos Passos (Avançar para o Plano 5)
 
-O Plano 3 está 100% concluído, com build verificado, 168 testes automatizados e 6 testes E2E móveis passando.
-A próxima ação é planejar o **Plano 4 — Painel de Análise e Aprovação da Engenharia (ou Histórico e Acompanhamento do Empreiteiro)**:
-- Fluxo de análise de medições enviadas (`EM_ANALISE`).
-- Ajuste de quantidade aprovada (`qty_approved`) pela engenharia (nível 1).
-- Devolução de medição com justificativa (`DEVOLVIDA`) vs Avanço no workflow de aprovação (`APROVADA`).
-- Histórico de medições anteriores do empreiteiro.
+Os Planos 1, 2, 3 e 4 estão 100% concluídos, com build verificado, 177 testes automatizados e 7 testes E2E do Playwright passando.
+A próxima ação é planejar o **Plano 5 — Emissão e Anexo de Nota Fiscal pelo Empreiteiro e Faturamento / Financeiro**:
+- Upload e anexo de Nota Fiscal (PDF) e espelho de medição pelo empreiteiro quando a medição atinge status `APROVADA` (ou `AGUARDANDO_NF`).
+- Validação de valor da NF contra o valor aprovado da medição (com suporte a tolerância configurada na obra via `invoice_tolerance`).
+- Conferência fiscal/financeira pela equipe da construtora (aprovação da NF -> status `NF_APROVADA` -> `PAGA`).
+- Liberação para pagamento e fechamento do ciclo financeiro.
 
 
 ---
