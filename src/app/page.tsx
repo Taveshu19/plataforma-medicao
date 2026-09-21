@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { carregarContexto } from './contexto'
 import { competenciaPorExtenso } from './formato'
@@ -63,13 +64,22 @@ export default async function Home() {
       )}
 
       <nav className="mt-8 space-y-3">
-        <button
-          type="button"
-          disabled
-          className="w-full rounded-xl bg-slate-900 px-4 py-5 text-base font-semibold text-white disabled:opacity-40"
-        >
-          Fazer minha medição
-        </button>
+        {periodo ? (
+          <Link
+            href="/medicao"
+            className="flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-5 text-base font-semibold text-white hover:bg-slate-800"
+          >
+            Fazer minha medição
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="w-full rounded-xl bg-slate-900 px-4 py-5 text-base font-semibold text-white disabled:opacity-40"
+          >
+            Fazer minha medição
+          </button>
+        )}
         <button
           type="button"
           disabled
