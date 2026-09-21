@@ -92,3 +92,45 @@ export async function obterVisaoContrato(contractId: string): Promise<VisaoContr
     saldoDisponivel,
   }
 }
+
+export interface ResumoServico {
+  serviceName: string
+  serviceGroup: string | null
+  unit: string
+  totalQuantity: number
+  measuredQuantity: number
+  balanceQuantity: number
+  totalAmount: number
+  measuredAmount: number
+  balanceAmount: number
+  locations: number
+}
+
+/**
+ * Total de cada serviço somando todos os locais do contrato.
+ * Pedido pelo cliente: "quantos m² ele tem total do serviço de contrapiso
+ * juntando todas as casas". Agrupa por serviço E unidade, porque somar
+ * "Contrapiso em m²" com "Contrapiso em verba" daria um número sem sentido.
+ */
+export async function obterResumoPorServico(contractId: string): Promise<ResumoServico[]> {
+  const supabase = await createServerSupabase()
+
+  const { data, error } = await supabase.rpc('get_contract_services_summary', {
+    p_contract_id: contractId,
+  })
+
+  if (error || !data) return []
+
+  return (data as Record<string, unknown>[]).map((r) => ({
+    serviceName: String(r.service_name),
+    serviceGroup: (r.service_group as string | null) ?? null,
+    unit: String(r.unit),
+    totalQuantity: Number(r.total_quantity),
+    measuredQuantity: Number(r.measured_quantity),
+    balanceQuantity: Number(r.balance_quantity),
+    totalAmount: Number(r.total_amount),
+    measuredAmount: Number(r.measured_amount),
+    balanceAmount: Number(r.balance_amount),
+    locations: Number(r.locations),
+  }))
+}

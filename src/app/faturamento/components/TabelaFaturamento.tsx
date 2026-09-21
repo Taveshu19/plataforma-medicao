@@ -43,10 +43,19 @@ export function TabelaFaturamento({ notas }: TabelaFaturamentoProps) {
     )
   })
 
+  // Data prevista de pagamento, informada pelo financeiro no momento da
+  // aprovacao. E opcional: sem ela a trilha do empreiteiro simplesmente nao
+  // mostra data, em vez de mostrar uma promessa vazia.
+  const [previsaoPorNota, setPrevisaoPorNota] = useState<Record<string, string>>({})
+
   const handleAprovar = async (item: NotaPendente) => {
     setProcessandoId(item.invoiceId)
     setMensagem(null)
-    const res = await aprovarNotaFiscalAction(item.invoiceId, item.measurementId)
+    const res = await aprovarNotaFiscalAction(
+      item.invoiceId,
+      item.measurementId,
+      previsaoPorNota[item.invoiceId] || null,
+    )
     setProcessandoId(null)
     if (!res.success) {
       setMensagem({ tipo: 'erro', texto: res.error ?? 'Erro ao aprovar nota fiscal.' })
@@ -237,6 +246,32 @@ export function TabelaFaturamento({ notas }: TabelaFaturamentoProps) {
 
                 {/* Botões de Ação */}
                 <div className="mt-5 border-t border-slate-100 pt-3">
+                  {emConferencia && (
+                    <div className="mb-3">
+                      <label
+                        htmlFor={`previsao-${item.invoiceId}`}
+                        className="block text-[11px] font-medium text-slate-600"
+                      >
+                        Previsão de pagamento (opcional)
+                      </label>
+                      <input
+                        id={`previsao-${item.invoiceId}`}
+                        type="date"
+                        value={previsaoPorNota[item.invoiceId] ?? ''}
+                        onChange={(e) =>
+                          setPrevisaoPorNota((prev) => ({
+                            ...prev,
+                            [item.invoiceId]: e.target.value,
+                          }))
+                        }
+                        className="mt-1 w-full rounded-xl border-0 px-3 py-2 text-xs shadow-xs ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-slate-900"
+                      />
+                      <p className="mt-1 text-[11px] text-slate-500">
+                        O empreiteiro passa a ver esta data no acompanhamento.
+                      </p>
+                    </div>
+                  )}
+
                   {emConferencia && (
                     <div className="flex gap-2">
                       <button

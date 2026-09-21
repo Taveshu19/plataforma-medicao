@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { carregarContexto } from './contexto'
 import { competenciaPorExtenso } from './formato'
 import { Dinheiro } from '@/components/Dinheiro'
+import { TrilhaStatus } from '@/components/TrilhaStatus'
 import { obterPerfilUsuario } from '@/lib/aprovacao/dados'
 
 export default async function Home() {
@@ -14,7 +15,8 @@ export default async function Home() {
   const contexto = await carregarContexto()
   if (!contexto) redirect('/entrar')
 
-  const { nome, obra, contratoNumero, descricao, resumo, periodo } = contexto
+  const { nome, obra, contratoNumero, descricao, resumo, periodo, trilha, protocoloAtual } =
+    contexto
 
   return (
     <main className="mx-auto w-full max-w-md px-5 pb-16 pt-8">
@@ -45,6 +47,8 @@ export default async function Home() {
           <Dinheiro rotulo="Saldo a medir" valor={resumo.disponivel} destaque />
         </div>
       </section>
+
+      <TrilhaStatus passos={trilha} protocolo={protocoloAtual} />
 
       {periodo ? (
         <section className="mt-5 rounded-2xl bg-emerald-50 p-5 ring-1 ring-emerald-200">

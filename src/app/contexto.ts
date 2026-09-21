@@ -1,4 +1,5 @@
 import { createServerSupabase } from '@/lib/supabase/server'
+import { montarTrilha, type PassoTrilha, type NivelAprovacao } from './trilha'
 
 export { formatarReais, competenciaPorExtenso } from './formato'
 
@@ -22,6 +23,10 @@ export interface ContextoEmpreiteiro {
   descricao: string | null
   resumo: Resumo
   periodo: Periodo | null
+  trilha: PassoTrilha[]
+  protocoloAtual: string | null
+  /** Rotulo do local nesta obra: casa, apartamento ou pavimento. */
+  rotuloLocal: string
 }
 
 /**
@@ -46,7 +51,7 @@ export async function carregarContexto(): Promise<ContextoEmpreiteiro | null> {
 
   const { data: contratos } = await supabase
     .from('contracts')
-    .select('id, number, description, project_id, projects(name)')
+    .select('id, number, description, project_id, projects(name, unit_label)')
     .order('number')
     .limit(1)
 
@@ -68,7 +73,39 @@ export async function carregarContexto(): Promise<ContextoEmpreiteiro | null> {
     .limit(1)
 
   const periodo = periodos?.[0]
-  const obra = (contrato as { projects?: { name?: string } }).projects?.name ?? 'Obra'
+  const projeto = (contrato as { projects?: { name?: string; unit_label?: string } }).projects
+  const obra = projeto?.name ?? 'Obra'
+  const rotuloLocal = projeto?.unit_label ?? 'local'
+
+  // Trilha de status: progresso da medicao viva + niveis configurados da obra.
+  // Os niveis vem do banco para que acrescentar um nivel nao exija mexer na tela.
+  const { data: progressoLinhas } = await supabase.rpc('get_current_measurement_progress', {
+    p_contract_id: contrato.id,
+  })
+  const progressoLinha = Array.isArray(progressoLinhas) ? progressoLinhas[0] : progressoLinhas
+
+  const { data: niveisLinhas } = await supabase
+    .from('approval_levels')
+    .select('level, label')
+    .eq('project_id', contrato.project_id)
+    .order('level')
+
+  const niveis: NivelAprovacao[] = (niveisLinhas ?? []).map((n) => ({
+    level: Number(n.level),
+    label: n.label,
+  }))
+
+  const trilha = montarTrilha(
+    progressoLinha
+      ? {
+          status: progressoLinha.status,
+          currentLevel: Number(progressoLinha.current_level ?? 0),
+          protocolo: progressoLinha.protocol ?? null,
+          dataPrevistaPagamento: progressoLinha.expected_payment_date ?? null,
+        }
+      : null,
+    niveis,
+  )
 
   return {
     nome: perfil?.full_name ?? user.email ?? 'Empreiteiro',
@@ -85,5 +122,8 @@ export async function carregarContexto(): Promise<ContextoEmpreiteiro | null> {
     periodo: periodo
       ? { competencia: periodo.competence, fechaEm: periodo.closes_at }
       : null,
+    trilha,
+    protocoloAtual: progressoLinha?.protocol ?? null,
+    rotuloLocal,
   }
 }

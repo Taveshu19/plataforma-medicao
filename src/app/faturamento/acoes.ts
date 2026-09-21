@@ -113,6 +113,7 @@ export async function enviarNotaFiscalAction(
 export async function aprovarNotaFiscalAction(
   invoiceId: string,
   measurementId: string,
+  dataPrevistaPagamento?: string | null,
 ): Promise<FaturamentoResultado> {
   const supabase = await createServerSupabase()
   const {
@@ -129,6 +130,18 @@ export async function aprovarNotaFiscalAction(
 
   if (error) {
     return { success: false, error: error.message }
+  }
+
+  // A previsão de pagamento é opcional: sem ela a trilha do empreiteiro
+  // apenas não mostra data, em vez de mostrar uma promessa vazia.
+  if (dataPrevistaPagamento) {
+    const { error: erroPrevisao } = await supabase.rpc('set_invoice_expected_payment', {
+      p_invoice_id: invoiceId,
+      p_expected_date: dataPrevistaPagamento,
+    })
+    if (erroPrevisao) {
+      return { success: false, error: erroPrevisao.message }
+    }
   }
 
   revalidatePath('/faturamento')
