@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 127.0.0.1",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -11,8 +11,10 @@
     "test:seed": "npx supabase db reset && vitest run tests/seed.test.ts tests/seed-usuarios.test.ts",
     "test:all": "npm run test && npm run test:seed",
     "test:watch": "vitest",
-    "db:reset": "npx supabase db reset"
+    "db:reset": "npx supabase db reset",
+    "e2e": "playwright test"
   },
+
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",
@@ -21,6 +23,7 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22",
     "@types/pg": "^8.23.1",
