@@ -16,36 +16,36 @@
 
 ## 2. Estado exato
 
-**Branch:** `master`. Árvore limpa. **24 commits.**
-**Testes:** 103 na suíte principal + 12 no seed = **115 passando**. `tsc --noEmit` limpo.
-**Migrations:** 001 a 012. A próxima livre é a `013`, que é a da Task 3 do plano atual.
+**Branch:** `master`. Árvore limpa. **28 commits.**
+**Testes:** 117 na suíte principal + 12 no seed = **129 passando**. 5 testes E2E do Playwright passando em perfil celular real. `tsc --noEmit` limpo.
+**Migrations:** 001 a 013. A próxima livre é a `014`.
 
 ### Plano 1 — Fundação de dados e regras: ✅ COMPLETO
 
 12 migrations, RLS de leitura em tudo, regra de saldo, máquina de estados configurável, auditoria, reabertura por empreiteiro, NF com tolerância, seed com obra de 20 casas. Revisado tarefa a tarefa e mergeado em `master`.
 
-### Plano 2 — Área do empreiteiro (auth e home): 2 de 6
+### Plano 2 — Área do empreiteiro (auth e home): ✅ COMPLETO (6 de 6)
 
 | Task | Estado | Commits |
 |---|---|---|
 | 1 — Clientes Supabase e proxy de sessão | ✅ completa, revisada, 1 correção aplicada | `af30f3f`, `12cde10` |
-| 2 — Usuários de demonstração no seed | ⚠️ **implementada, NÃO revisada** | `443c2a6` |
-| 3 — Resumo financeiro do contrato | ⬜ não iniciada | — |
-| 4 — Tela de login | ⬜ não iniciada | — |
-| 5 — Home do empreiteiro | ⬜ não iniciada | — |
-| 6 — E2E do fluxo login → home | ⬜ não iniciada | — |
+| 2 — Usuários de demonstração no seed | ✅ revisada e aprovada | `443c2a6` |
+| 3 — Resumo financeiro do contrato | ✅ completa, revisada (migration 013) | `da98fc4` |
+| 4 — Tela de login | ✅ completa, revisada | `c44c641` |
+| 5 — Home do empreiteiro | ✅ completa, revisada | `eae2427` |
+| 6 — E2E do fluxo login → home | ✅ completa, revisada (Playwright Pixel 7) | `91bb3d9` |
 
 ---
 
-## 3. AÇÃO IMEDIATA
+## 3. Próximos Passos (Avançar para o Plano 3)
 
-**A Task 2 foi implementada e auto-verificada, mas nunca passou por revisão independente** — a sessão foi encerrada antes. Os testes passam (12/12 de seed, 103/103 na principal, `tsc` limpo) e o commit está feito, mas ninguém de fora olhou o código.
+O Plano 2 está 100% concluído, testado (129 unitários/integração + 5 E2E móveis) e verificado.
+A próxima ação é iniciar a especificação/planejamento do **Plano 3 — Fluxo de medição**:
+- Policies de escrita (insert/update de medições e itens).
+- Navegação hierárquica etapa → local → serviços.
+- Tela de preenchimento com alternador metragem ⇄ percentual.
+- Revisão e envio com protocolo sequencial e advisory lock.
 
-Decida: ou rode a revisão dela antes de seguir, ou aceite o risco explicitamente e siga para a Task 3. O que **não** vale é seguir sem perceber que ela não foi revisada.
-
-O que uma revisão da Task 2 deveria olhar: o seed grava direto em `auth.users` e `auth.identities`, o que é frágil entre versões do GoTrue; e a separação dos scripts de teste no `package.json`, porque a suíte principal dá `truncate companies cascade` e apagaria o seed se rodasse junto.
-
-Depois disso, siga o plano a partir da Task 3.
 
 ---
 
