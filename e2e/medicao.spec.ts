@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test'
+import { resetAlfaCurrentMeasurement } from './helpers/db'
 
 test.describe('fluxo de medicao do empreiteiro (mobile)', () => {
+  test.beforeEach(async () => {
+    await resetAlfaCurrentMeasurement()
+  })
+
   test('fluxo completo: home -> medicao -> preenchimento com metragem e % -> revisao -> envio com protocolo', async ({
     page,
   }) => {

@@ -55,6 +55,7 @@ export function TabelaMedicoes({ medicoes }: TabelaMedicoesProps) {
           {filtradas.map((med) => (
             <div
               key={med.id}
+              data-testid={`card-medicao-${med.protocol}`}
               className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
             >
               <div className="flex flex-wrap items-start justify-between gap-2">

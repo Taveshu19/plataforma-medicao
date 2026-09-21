@@ -26,6 +26,46 @@ export default async function RevisaoMedicaoPage() {
 
   // Se já foi enviada e está em análise ou outro status
   if (rascunho.status !== 'RASCUNHO' && rascunho.status !== 'DEVOLVIDA') {
+    if (rascunho.status === 'EM_ANALISE') {
+      return (
+        <main className="mx-auto w-full max-w-md px-5 pb-16 pt-8">
+          <div className="rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+              <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <h1 className="mt-4 text-xl font-bold tracking-tight text-slate-900">
+              Medição enviada com sucesso!
+            </h1>
+
+            {rascunho.protocol && (
+              <div className="mt-4 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Protocolo
+                </p>
+                <p data-testid="protocolo-medicao" className="mt-1 font-mono text-xl font-bold text-slate-900">
+                  {rascunho.protocol}
+                </p>
+              </div>
+            )}
+
+            <p className="mt-4 text-xs text-slate-600">
+              Sua medição foi registrada e agora está em análise pela equipe da obra. Você poderá acompanhar o status na tela inicial.
+            </p>
+
+            <Link
+              href="/"
+              className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-3.5 text-sm font-semibold text-white shadow hover:bg-slate-800"
+            >
+              Voltar para o início
+            </Link>
+          </div>
+        </main>
+      )
+    }
+
     return (
       <main className="mx-auto w-full max-w-md px-5 pb-16 pt-8">
         <div className="rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200">
