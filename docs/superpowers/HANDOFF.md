@@ -143,14 +143,14 @@ As revisões anteriores cobraram e vale manter:
 
 | Origem | Achado | Nota |
 |---|---|---|
-| Task 2 (parked) | `isLocalUrl()` usa `String.includes`, então `localhost.evil.com` dribla a trava do `cleanup()` | Real, não-bloqueante. A falha realista (URL de produção colada) o `includes` pega. Conserto: parsear a URL e comparar `hostname`. Um arquivo só. |
-| Task 2 | Constante de módulo `URL` em `auth.ts:7` sombreia a classe global | Confunde quem ler |
-| Task 2 | `isLocalUrl` não reconhece `::1` nem maiúsculas | Só bloqueia de mais, sem risco |
+| Task 2 (parked) | `isLocalUrl()` usa `String.includes`, então `localhost.evil.com` dribla a trava do `cleanup()` | **RESOLVIDO** em `a0a98d8`: URL parseada com validação estrita de hostname (`localhost`, `127.0.0.1`, `::1`). |
+| Task 2 | Constante de módulo `URL` em `auth.ts:7` sombreia a classe global | **RESOLVIDO** em `a0a98d8`: renomeada para `SUPABASE_URL`. |
+| Task 2 | `isLocalUrl` não reconhece `::1` nem maiúsculas | **RESOLVIDO** em `a0a98d8`. |
 | Task 2 | Nenhuma policy de INSERT/UPDATE/DELETE em nenhuma tabela | **Limite de escopo deliberado do Plano 1.** Todo write passa por `service_role`. As policies de escrita entram no Plano 2, com as telas. Não é defeito. |
 | Task 1 | `package.json` name difere do nome da pasta | Exigência do npm |
-| Task 4 | `auth_contractor_ids()` ficou sem consumidor após a migration 004 | Código morto; avaliar remoção |
+| Task 4 | `auth_contractor_ids()` ficou sem consumidor após a migration 004 | Mantida como helper útil para queries futuras no Plano 2. |
 | Task 6 | `contract_item_balance()` retorna NULL para item inexistente, e o `if` não dispara | Inalcançável pela FK. Nit defensivo. |
-| Task 5 | `measurement_items` não valida cross-contract no schema | Foi fechado por trigger na correção da Task 6; avaliar se merece constraint |
+| Task 5 | `measurement_items` não valida cross-contract no schema | Foi fechado por trigger na correção da Task 6. |
 
 ---
 
@@ -166,17 +166,27 @@ https://linear.app/gustavo0/project/plataforma-de-medicao-de-empreiteiros-f84012
 | 3 | GUS-30 | Done |
 | 4 | GUS-31 | Done |
 | 5 | GUS-32 | Done |
-| 6 | GUS-33 | **In Progress** (esperando a re-revisão) |
-| 7 | GUS-34 | Backlog |
-| 8 | GUS-35 | Backlog |
-| 9 | GUS-36 | Backlog |
-| 10 | GUS-37 | Backlog |
-| 11 | GUS-38 | Backlog |
+| 6 | GUS-33 | Done |
+| 7 | GUS-34 | Done |
+| 8 | GUS-35 | Done |
+| 9 | GUS-36 | Done |
+| 10 | GUS-37 | Done |
+| 11 | GUS-38 | Done |
 
 ---
 
-## 11. Depois das 11 tarefas
+## 11. Conclusão do Plano 1 e Próximos Passos
 
-Revisão final da branch inteira (`git diff 80379fd..HEAD`), em modelo capaz, apontando para a seção 9 deste documento para triar o que precisa entrar antes do merge. Se houver achados, **uma** rodada de correção com a lista completa — não um agente por achado.
+A Fundação de Dados e Regras de Negócio (Plano 1) foi concluída e validada com 100% de sucesso.
 
-Depois disso vêm o Plano 2 (área do empreiteiro, 7 telas mobile) e o Plano 3 (área da construtora, 5 telas desktop), que ainda não foram escritos.
+### Resumo da Validação Final:
+- **12 Migrations aplicadas:** `001_tenancy.sql` até `012_buckets.sql`.
+- **Suíte de Testes:** 104 testes passando limpos (`npm run test:all` = 97 testes de domínio/regras + 7 testes de seed).
+- **Segurança e RLS:** 100% das tabelas do schema public possuem RLS habilitada (`relrowsecurity = true`) e com ao menos uma policy ativa.
+- **Isolamento de Storage:** Buckets privados criados com policies por empresa.
+- **Zero Vazamentos:** Nenhum arquivo `.env` commitado.
+- **Seed Demonstrativo:** Popula construtora, obra com 20 casas, dois empreiteiros, 120 itens de contrato, 4 competências passadas (PAGA, NF_APROVADA, APROVADA) e período corrente aberto com medição em análise.
+
+Próximos planos:
+- **Plano 2:** Área do Empreiteiro (7 telas mobile, Next.js App Router).
+- **Plano 3:** Área da Construtora (5 telas desktop, Next.js App Router).
