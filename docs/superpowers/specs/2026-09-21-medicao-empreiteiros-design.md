@@ -272,3 +272,29 @@ O spec de origem e os dois mockups fornecidos. Observações registradas na revi
 - A aritmética do painel "Meu Contrato" confirma a regra de saldo: contratado R$ 850.000 = aprovado R$ 410.000 + em aprovação R$ 30.000 + saldo R$ 410.000.
 - O mockup detalhado traz "Tipologia padrão – 70,00 m²", confirmando a necessidade de `unit_types`.
 - O total da tela de medição do mockup está somado errado (R$ 6.065 onde a soma das linhas dá R$ 8.065). Não é defeito do mockup — é a tese do produto se provando: quem desenhou a tela com calma errou uma soma de seis linhas.
+
+---
+
+## 12. Integração com ERP — requisito de produto levantado pelo Pedro (2026-09-21)
+
+**A aprovação tem que acontecer uma vez só.**
+
+Nas construtoras, o sistema financeiro (Sienge, TOTVS, UAU) já tem seu próprio fluxo de aprovação de medição. Se o engenheiro precisar aprovar no nosso app **e** no ERP, o produto vira trabalho a mais em vez de menos — e é abandonado.
+
+Portanto o desenho correto é: **o app é o ponto de aprovação**, e a medição sobe sozinha para o ERP quando recebe a aprovação final. O engenheiro aprova uma vez.
+
+Isso não é um detalhe de integração, é a condição para o produto ser adotado em construtora que já tem ERP.
+
+### O que já está pronto para isso
+
+A medição sai estruturada com item de contrato, quantidade aprovada, preço unitário, protocolo e trilha de auditoria completa. Esse é o formato que um ERP precisa receber — a parte difícil já existe.
+
+### Três riscos a tratar quando a integração for construída
+
+1. **A decisão é política, não técnica.** A construtora precisa aceitar que a aprovação vale fora do ERP. Há empresas que resistem por controle interno. Sentir essa temperatura antes de investir.
+2. **Falha de envio não pode ser silenciosa.** Precisa de fila, nova tentativa e um estado visível (`APROVADA, aguardando envio ao ERP`). Sem isso o app afirma uma coisa e o ERP outra — divergência silenciosa é pior que aprovação dupla.
+3. **Cada ERP é um mapeamento próprio.** O primeiro custa caro; os seguintes reaproveitam a estrutura. Escolher o primeiro pelo cliente que fechar, não pela popularidade.
+
+### Posicionamento
+
+Integração é argumento de venda para construtora que já tem ERP, mas **não é MVP**. Ela se constrói depois que houver cliente, com acesso à documentação e às credenciais dele.
