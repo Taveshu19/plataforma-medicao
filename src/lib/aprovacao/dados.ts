@@ -194,3 +194,76 @@ export async function obterDetalhesMedicaoAnalise(
     totalApproved,
   }
 }
+
+export interface EventoAuditoria {
+  id: string
+  action: string
+  actorName: string
+  actorRole: string
+  level: number | null
+  oldValue: string | null
+  newValue: string | null
+  reason: string | null
+  serviceName: string | null
+  createdAt: string
+}
+
+/**
+ * Retorna a linha do tempo cronológica de auditoria de uma medição.
+ */
+export async function obterLinhaDoTempoAuditoria(
+  measurementId: string,
+): Promise<EventoAuditoria[]> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase.rpc('get_measurement_audit_timeline', {
+    p_measurement_id: measurementId,
+  })
+
+  if (error || !data) return []
+
+  return data.map((d: any) => ({
+    id: d.id,
+    action: d.action,
+    actorName: d.actor_name,
+    actorRole: d.actor_role,
+    level: d.level,
+    oldValue: d.old_value,
+    newValue: d.new_value,
+    reason: d.reason,
+    serviceName: d.service_name,
+    createdAt: d.created_at,
+  }))
+}
+
+/**
+ * Lista medições da construtora com filtro opcional por status ('EM_ANALISE', 'APROVADAS', 'DEVOLVIDAS', etc).
+ */
+export async function listarMedicoesPorStatus(
+  status?: string,
+): Promise<MedicaoPendente[]> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase.rpc('get_company_measurements', {
+    p_status: status ?? null,
+  })
+
+  if (error || !data) return []
+
+  return data.map((r: any) => ({
+    id: r.id,
+    protocol: r.protocol,
+    status: r.status,
+    currentLevel: r.current_level,
+    submittedAt: r.submitted_at,
+    projectId: r.project_id,
+    projectName: r.project_name,
+    contractId: r.contract_id,
+    contractNumber: r.contract_number,
+    contractorId: r.contractor_id,
+    contractorName: r.contractor_name,
+    competence: r.competence,
+    totalRequested: Number(r.total_requested),
+    totalApproved: Number(r.total_approved),
+    itemsCount: Number(r.items_count),
+  }))
+}
+

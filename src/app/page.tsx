@@ -92,18 +92,13 @@ export default async function Home() {
         >
           Medições anteriores
         </Link>
-        <button
-          type="button"
-          disabled
-          className="w-full rounded-xl bg-white px-4 py-5 text-base font-semibold text-slate-900 ring-1 ring-slate-300 disabled:opacity-40"
+        <Link
+          href="/contrato"
+          className="flex w-full items-center justify-center rounded-xl bg-white px-4 py-5 text-base font-semibold text-slate-900 ring-1 ring-slate-300 hover:bg-slate-50"
         >
           Meu contrato
-        </button>
+        </Link>
       </nav>
-
-      <p className="mt-6 text-center text-xs text-slate-500">
-        As três ações acima entram nos próximos planos.
-      </p>
     </main>
   )
 }

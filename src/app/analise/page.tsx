@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { obterPerfilUsuario, listarMedicoesPendentes } from '@/lib/aprovacao/dados'
+import { obterPerfilUsuario, listarMedicoesPorStatus } from '@/lib/aprovacao/dados'
 import { TabelaMedicoes } from './components/TabelaMedicoes'
 
 export default async function PainelAnalisePage() {
@@ -10,7 +10,7 @@ export default async function PainelAnalisePage() {
     redirect('/')
   }
 
-  const medicoes = await listarMedicoesPendentes()
+  const medicoes = await listarMedicoesPorStatus()
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 pb-16 pt-8">
@@ -45,12 +45,6 @@ export default async function PainelAnalisePage() {
       </header>
 
       <section className="mt-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">
-            Medições Pendentes ({medicoes.length})
-          </h2>
-        </div>
-
         <TabelaMedicoes medicoes={medicoes} />
       </section>
     </main>

@@ -1,8 +1,13 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { obterPerfilUsuario, obterDetalhesMedicaoAnalise } from '@/lib/aprovacao/dados'
+import {
+  obterPerfilUsuario,
+  obterDetalhesMedicaoAnalise,
+  obterLinhaDoTempoAuditoria,
+} from '@/lib/aprovacao/dados'
 import { competenciaPorExtenso } from '@/app/formato'
 import { TabelaAjustes } from './TabelaAjustes'
+import { LinhaDoTempoAuditoria } from './components/LinhaDoTempoAuditoria'
 
 interface PageProps {
   params: Promise<{
@@ -25,18 +30,33 @@ export default async function AnaliseDetalhePage({ params }: PageProps) {
     redirect('/analise')
   }
 
+  const eventosAuditoria = await obterLinhaDoTempoAuditoria(measurementId)
+
   return (
     <main className="mx-auto w-full max-w-2xl px-5 pb-32 pt-6">
       <header className="mb-6">
-        <Link
-          href="/analise"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900"
-        >
-          <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Voltar para a lista de medições
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link
+            href="/analise"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Voltar para a lista de medições
+          </Link>
+
+          <Link
+            href={`/medicoes/${measurementId}/espelho`}
+            target="_blank"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Ver Espelho / Imprimir
+          </Link>
+        </div>
 
         <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -74,6 +94,8 @@ export default async function AnaliseDetalhePage({ params }: PageProps) {
         itens={dados.itens}
         totalRequested={dados.totalRequested}
       />
+
+      <LinhaDoTempoAuditoria eventos={eventosAuditoria} />
     </main>
   )
 }
