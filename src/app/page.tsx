@@ -3,8 +3,14 @@ import { redirect } from 'next/navigation'
 import { carregarContexto } from './contexto'
 import { competenciaPorExtenso } from './formato'
 import { Dinheiro } from '@/components/Dinheiro'
+import { obterPerfilUsuario } from '@/lib/aprovacao/dados'
 
 export default async function Home() {
+  const perfil = await obterPerfilUsuario()
+  if (perfil?.isConstrutora) {
+    redirect('/analise')
+  }
+
   const contexto = await carregarContexto()
   if (!contexto) redirect('/entrar')
 
