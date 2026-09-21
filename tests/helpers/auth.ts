@@ -56,8 +56,30 @@ export async function createCompany(name: string): Promise<string> {
   return rows[0].id
 }
 
+function isLocalUrl(value: string): boolean {
+  return value.includes('127.0.0.1') || value.includes('localhost')
+}
+
+/**
+ * Trava defensiva: cleanup() apaga TODOS os usuarios do Auth e da um
+ * `truncate companies cascade`. So pode rodar contra a stack local.
+ */
+function assertLocalStack(): void {
+  const dbUrl = process.env.DB_URL ?? ''
+  const apiUrl = URL
+
+  if (!isLocalUrl(dbUrl) || !isLocalUrl(apiUrl)) {
+    throw new Error(
+      'cleanup() so pode rodar contra a stack local (DB_URL/API_URL apontando para ' +
+        '127.0.0.1 ou localhost). Abortando para evitar apagar dados de um ambiente real.',
+    )
+  }
+}
+
 /** Remove todos os usuarios de teste e dados de negocio. */
 export async function cleanup(): Promise<void> {
+  assertLocalStack()
+
   const { data } = await admin.auth.admin.listUsers()
   for (const user of data?.users ?? []) {
     await admin.auth.admin.deleteUser(user.id)
