@@ -22,7 +22,8 @@ declare
   v_status    text;
   v_servico   record;
 begin
-  insert into companies (name) values ('Construtora Vista Ltda') returning id into v_company;
+  insert into companies (name, is_demo) values ('Construtora Vista Ltda', true)
+  returning id into v_company;
 
   insert into projects (company_id, name, unit_label, approval_levels,
                         invoice_tolerance, measurement_input_mode)

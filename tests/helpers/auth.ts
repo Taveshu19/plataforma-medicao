@@ -83,14 +83,29 @@ function assertLocalStack(): void {
 }
 
 /** Remove todos os usuarios de teste e dados de negocio. */
+/** E-mails da demonstracao. A limpeza nunca remove estes usuarios. */
+const DOMINIO_DEMONSTRACAO = '@demo.test'
+
+/**
+ * Remove o que os testes criaram, preservando os dados de demonstracao.
+ *
+ * Antes isto apagava o banco inteiro, e rodar a suite derrubava a demonstracao
+ * — quem abrisse o link nesse intervalo nao conseguia nem entrar. A empresa de
+ * demonstracao carrega `is_demo = true` e os usuarios dela usam o dominio
+ * @demo.test; ambos ficam de fora da limpeza.
+ *
+ * Apagar a empresa leva junto obras, contratos e medicoes: todas as chaves
+ * estrangeiras para `companies` cascateiam no delete.
+ */
 export async function cleanup(): Promise<void> {
   assertLocalStack()
 
   const { data } = await admin.auth.admin.listUsers()
   for (const user of data?.users ?? []) {
+    if (user.email?.endsWith(DOMINIO_DEMONSTRACAO)) continue
     await admin.auth.admin.deleteUser(user.id)
   }
-  await sql('truncate companies cascade')
+  await sql('delete from companies where is_demo = false')
 }
 
 /** Cria usuario cujo acesso e limitado a uma unica obra. */
