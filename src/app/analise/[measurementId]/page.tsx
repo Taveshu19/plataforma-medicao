@@ -102,6 +102,7 @@ export default async function AnaliseDetalhePage({ params }: PageProps) {
         measurementId={measurementId}
         itens={dados.itens}
         totalRequested={dados.totalRequested}
+        protocolo={dados.protocol ?? null}
       />
 
       <EvidenciasRecebidas anexos={anexos} nomePorItem={nomePorItem} />

@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation'
 import { ItemAnalise } from '@/lib/aprovacao/dados'
 import { formatarReais } from '@/app/formato'
 import { validateQty, calcSubtotal } from '@/app/medicao/conversao'
-import { ajustarQuantidadeAprovada, aprovarMedicao } from '@/app/analise/acoes'
+import { ajustarQuantidadeAprovada, aprovarMedicao, cancelarMedicao } from '@/app/analise/acoes'
 import { ModalDevolucao } from './ModalDevolucao'
+import { ModalCancelamento } from './ModalCancelamento'
 
 interface TabelaAjustesProps {
+  protocolo?: string | null
   measurementId: string
   itens: ItemAnalise[]
   totalRequested: number
@@ -18,9 +20,13 @@ export function TabelaAjustes({
   measurementId,
   itens,
   totalRequested,
+  protocolo,
 }: TabelaAjustesProps) {
   const router = useRouter()
   const [modalDevolver, setModalDevolver] = useState(false)
+  const [modalCancelar, setModalCancelar] = useState(false)
+  const [cancelando, setCancelando] = useState(false)
+  const [erroCancelar, setErroCancelar] = useState<string | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [aprovando, setAprovando] = useState(false)
   const [mensagemSucesso, setMensagemSucesso] = useState<string | null>(null)
@@ -92,6 +98,19 @@ export function TabelaAjustes({
     setSalvando(false)
     setMensagemSucesso('Ajustes salvos com sucesso!')
     return true
+  }
+
+  const handleCancelar = async (motivo: string) => {
+    setCancelando(true)
+    setErroCancelar(null)
+    const res = await cancelarMedicao(measurementId, motivo)
+    setCancelando(false)
+    if (!res.success) {
+      setErroCancelar(res.error ?? 'Nao foi possivel cancelar a medicao.')
+      return
+    }
+    setModalCancelar(false)
+    router.push('/analise')
   }
 
   // Aprovar medição
@@ -286,6 +305,15 @@ export function TabelaAjustes({
         <div className="mx-auto flex max-w-2xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
           <button
             type="button"
+            onClick={() => setModalCancelar(true)}
+            disabled={aprovando || salvando || cancelando}
+            className="rounded-xl bg-white px-4 py-3 text-xs font-bold text-slate-500 ring-1 ring-slate-300 hover:bg-slate-50 disabled:opacity-50"
+          >
+            Cancelar medição
+          </button>
+
+          <button
+            type="button"
             onClick={() => setModalDevolver(true)}
             disabled={aprovando || salvando}
             className="rounded-xl bg-white px-4 py-3 text-xs font-bold text-rose-700 ring-1 ring-rose-300 hover:bg-rose-50 disabled:opacity-50"
@@ -312,6 +340,18 @@ export function TabelaAjustes({
           </button>
         </div>
       </div>
+
+      <ModalCancelamento
+        aberto={modalCancelar}
+        protocolo={protocolo ?? null}
+        processando={cancelando}
+        erro={erroCancelar}
+        onFechar={() => {
+          setModalCancelar(false)
+          setErroCancelar(null)
+        }}
+        onConfirmar={handleCancelar}
+      />
 
       <ModalDevolucao
         measurementId={measurementId}

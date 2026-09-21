@@ -101,3 +101,42 @@ export async function devolverMedicao(
   revalidatePath('/')
   return { success: true, novoStatus: 'DEVOLVIDA' }
 }
+
+/**
+ * Cancela a medição, com motivo obrigatório.
+ *
+ * É a única saída para corrigir medição já aprovada: o desenho manda cancelar
+ * e refazer, para que o histórico não seja reescrito. Cancelar devolve o saldo
+ * e libera o período para uma medição nova no mesmo contrato.
+ */
+export async function cancelarMedicao(
+  measurementId: string,
+  motivo: string,
+): Promise<AcaoResultado> {
+  const supabase = await createServerSupabase()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'Usuário não autenticado.' }
+  }
+
+  if (!motivo || motivo.trim().length < 5) {
+    return { success: false, error: 'Descreva o motivo do cancelamento.' }
+  }
+
+  const { error } = await supabase.rpc('cancel_measurement', {
+    p_measurement_id: measurementId,
+    p_reason: motivo.trim(),
+  })
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/analise')
+  revalidatePath(`/analise/${measurementId}`)
+  revalidatePath('/')
+  return { success: true }
+}
