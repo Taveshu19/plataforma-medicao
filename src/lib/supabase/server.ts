@@ -16,7 +16,14 @@ export async function createServerSupabase() {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, _headers) {
+          // _headers traz os headers de no-cache que devem acompanhar uma
+          // resposta que grava cookie de sessao (CDN nao pode cachear isso).
+          // Um componente/acao de servidor nao tem acesso ao objeto de
+          // resposta HTTP para aplicar headers, entao nao ha onde escrever
+          // isso aqui — e descartado de proposito, nao por esquecimento.
+          // Quem aplica esses headers e o proxy (src/proxy.ts), que roda
+          // antes e tem a resposta em maos.
           try {
             for (const { name, value, options } of cookiesToSet) {
               cookieStore.set(name, value, options)

@@ -14,13 +14,21 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, headers) {
           for (const { name, value } of cookiesToSet) {
             request.cookies.set(name, value)
           }
           response = NextResponse.next({ request })
           for (const { name, value, options } of cookiesToSet) {
             response.cookies.set(name, value, options)
+          }
+          // A lib manda headers de no-cache junto da primeira escrita de
+          // cookie de sessao (ex.: Cache-Control: private, no-cache,
+          // no-store, must-revalidate, max-age=0). Sem isso, um CDN/proxy
+          // na frente pode cachear a resposta e servir o token de sessao
+          // de um usuario para outro.
+          for (const [chave, valor] of Object.entries(headers)) {
+            response.headers.set(chave, valor)
           }
         },
       },
@@ -34,7 +42,7 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const caminho = request.nextUrl.pathname
-  const ehPublica = ROTAS_PUBLICAS.some((r) => caminho.startsWith(r))
+  const ehPublica = ROTAS_PUBLICAS.some((r) => caminho === r || caminho.startsWith(r + '/'))
 
   if (!user && !ehPublica) {
     const url = request.nextUrl.clone()
