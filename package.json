@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run",
+    "test": "vitest run --exclude tests/seed.test.ts",
+    "test:seed": "npx supabase db reset && vitest run tests/seed.test.ts",
+    "test:all": "npm run test && npm run test:seed",
     "test:watch": "vitest",
-    "db:reset": "supabase db reset"
+    "db:reset": "npx supabase db reset"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",
