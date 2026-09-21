@@ -16,9 +16,9 @@
 
 ## 2. Estado exato
 
-**Branch:** `master`. Árvore limpa. **44 commits.**
-**Testes:** 165 na suíte principal + 12 no seed = **177 passando**. 7 testes E2E do Playwright passando em perfil celular real (Pixel 7). `npm run build` e `npx tsc --noEmit` limpos.
-**Migrations:** 001 a 018. A próxima livre é a `019`.
+**Branch:** `master`. Árvore limpa. **45 commits.**
+**Testes:** 178 na suíte principal + 12 no seed = **190 passando**. 8 testes E2E do Playwright passando em perfil celular real (Pixel 7). `npm run build` e `npx tsc --noEmit` limpos.
+**Migrations:** 001 a 019.
 
 ### Plano 1 — Fundação de dados e regras: ✅ COMPLETO
 12 migrations, RLS de leitura em tudo, regra de saldo, máquina de estados configurável, auditoria, reabertura por empreiteiro, NF com tolerância, seed com obra de 20 casas.
@@ -49,16 +49,31 @@ Clientes Supabase e proxy de sessão, usuários de demonstração no seed, resum
 | 5 — Tela de histórico do empreiteiro com motivo de devolução | ✅ completa (`/medicoes`, link direto na Home, badges de status, motivo da devolução destacado com link para correção) | `740eca7` |
 | 6 — Suíte E2E do ciclo completo de aprovação e validação | ✅ completa (`e2e/aprovacao.spec.ts`, helper de isolamento `e2e/helpers/db.ts`, 7/7 testes E2E verdes) | `05f2377` |
 
+### Plano 5 — Emissão e Anexo de Nota Fiscal pelo Empreiteiro e Faturamento / Financeiro: ✅ COMPLETO (6 de 6)
+
+| Task | Estado | Commits |
+|---|---|---|
+| 1 — Regras fiscais e RPCs no banco | ✅ completa (migration 019, tolerância fiscal, approve_invoice, reject_invoice, pay_invoice) | `57c77ee` |
+| 2 — Helpers de dados e Server Actions de faturamento | ✅ completa (`src/lib/faturamento/dados.ts`, `src/app/faturamento/acoes.ts`) | `57c77ee` |
+| 3 — Emissão e anexo de NF móvel pelo empreiteiro | ✅ completa (`/medicoes/[id]/nf`, validação ao vivo de valor e tolerância, upload PDF) | `57c77ee` |
+| 4 — Painel de faturamento desktop para a construtora | ✅ completa (`/faturamento`, abas por status, aprovação, rejeição com motivo e liquidação) | `57c77ee` |
+| 5 — Sincronização do extrato e quitação no histórico | ✅ completa (saldo e status `PAGA` sincronizados no contrato e na listagem) | `57c77ee` |
+| 6 — Suíte E2E do ciclo fiscal e financeiro | ✅ completa (`e2e/faturamento.spec.ts`, 8/8 testes E2E verdes) | `57c77ee` |
+
 ---
 
-## 3. Próximos Passos (Avançar para o Plano 5)
+## 3. Próximos Passos (Evolução pós-MVP)
 
-Os Planos 1, 2, 3 e 4 estão 100% concluídos, com build verificado, 177 testes automatizados e 7 testes E2E do Playwright passando.
-A próxima ação é planejar o **Plano 5 — Emissão e Anexo de Nota Fiscal pelo Empreiteiro e Faturamento / Financeiro**:
-- Upload e anexo de Nota Fiscal (PDF) e espelho de medição pelo empreiteiro quando a medição atinge status `APROVADA` (ou `AGUARDANDO_NF`).
-- Validação de valor da NF contra o valor aprovado da medição (com suporte a tolerância configurada na obra via `invoice_tolerance`).
-- Conferência fiscal/financeira pela equipe da construtora (aprovação da NF -> status `NF_APROVADA` -> `PAGA`).
-- Liberação para pagamento e fechamento do ciclo financeiro.
+Os Planos 1, 2, 3, 4 e 5 estão 100% concluídos, cobrindo todo o ciclo operacional, fiscal e financeiro da especificação:
+1. **Medição do Empreiteiro:** login, seleção de locais, conversor metragem ⇄ %, salvamento seguro em rascunho e envio oficial com protocolo sequencial anti-colisão.
+2. **Aprovação da Engenharia:** painel corporativo, rebalanceamento de quantidades, devolução com motivo obrigatório e reabertura com correção.
+3. **Faturamento e Financeiro:** emissão e anexo de NF (PDF) pelo empreiteiro com margem de tolerância, conferência fiscal com aprovação ou rejeição, liquidação financeira e atualização do extrato.
+
+Próximos refinamentos recomendados:
+- **Exportação de Documentos:** Geração de espelho de medição em PDF para assinatura física ou digital.
+- **Notificações em Tempo Real:** Alertas automáticos (e-mail / WhatsApp / push) para avisar o empreiteiro sobre devoluções ou liberação para emissão de NF.
+- **Filtros e Relatórios Financeiros:** Filtros avançados por competência, obra e empreiteiro no painel `/faturamento`.
+- **Homologação e Deploy:** Configuração do pipeline de CI/CD para deploy em ambiente de staging (conforme restrição de conta Netlify na seção 10).
 
 
 ---
@@ -128,13 +143,14 @@ Plano 2: GUS-39 (Done) · GUS-40 (Task 2, **mover para Done se a revisão passar
 
 ---
 
-## 9. Depois do Plano 2
+## 9. Status dos Planos da Especificação do MVP
+ 
+- **Plano 1** — Fundação de dados, regras de saldo e isolamento RLS: **Concluído**
+- **Plano 2** — Área do empreiteiro (autenticação e resumo do contrato): **Concluído**
+- **Plano 3** — Fluxo de medição móvel, seleção de locais, alternador m² ⇄ % e envio com protocolo: **Concluído**
+- **Plano 4** — Painel corporativo de análise da engenharia, rebalanceamento e devoluções com motivo: **Concluído**
+- **Plano 5** — Módulo de emissão de NF móvel, conferência fiscal, faturamento e quitação: **Concluído**
 
-- **Plano 3** — fluxo de medição: policies de escrita, navegação etapa → local → serviços, a tela de preenchimento com alternador metragem ⇄ percentual, revisão e envio. É o coração do produto.
-- **Plano 4** — histórico e nota fiscal.
-- **Plano 5** — área da construtora: análise, aprovação, faturamento. Fecha o ciclo.
-
-Nenhum deles foi escrito ainda.
 
 ---
 
