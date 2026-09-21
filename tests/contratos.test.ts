@@ -170,3 +170,96 @@ describe('modelagem de itens', () => {
     expect(Number(rows[0].count)).toBe(2)
   })
 })
+
+describe('isolamento por empresa quando o usuario atua em mais de uma construtora', () => {
+  let construtoraA: string
+  let construtoraB: string
+  let obraA: string
+  let obraB: string
+  let contratoAlfaA: string
+  let contratoBetaB: string
+  let contratoGamaB: string
+  let usuarioMultiplo: TestUser
+
+  beforeAll(async () => {
+    construtoraA = await createCompany('Construtora A')
+    construtoraB = await createCompany('Construtora B')
+
+    const [pa] = await sql<{ id: string }>(
+      `insert into projects (company_id, name) values ($1, 'Obra A') returning id`,
+      [construtoraA],
+    )
+    obraA = pa.id
+    const [pb] = await sql<{ id: string }>(
+      `insert into projects (company_id, name) values ($1, 'Obra B') returning id`,
+      [construtoraB],
+    )
+    obraB = pb.id
+
+    const [contractorAlfaA] = await sql<{ id: string }>(
+      'insert into contractors (company_id, name) values ($1, $2) returning id',
+      [construtoraA, 'Alfa A'],
+    )
+    const [contractAlfaA] = await sql<{ id: string }>(
+      `insert into contracts (company_id, project_id, contractor_id, number)
+       values ($1, $2, $3, '001/A') returning id`,
+      [construtoraA, obraA, contractorAlfaA.id],
+    )
+    contratoAlfaA = contractAlfaA.id
+
+    const [contractorBetaB] = await sql<{ id: string }>(
+      'insert into contractors (company_id, name) values ($1, $2) returning id',
+      [construtoraB, 'Beta B'],
+    )
+    const [contractBetaB] = await sql<{ id: string }>(
+      `insert into contracts (company_id, project_id, contractor_id, number)
+       values ($1, $2, $3, '001/B') returning id`,
+      [construtoraB, obraB, contractorBetaB.id],
+    )
+    contratoBetaB = contractBetaB.id
+
+    const [contractorGamaB] = await sql<{ id: string }>(
+      'insert into contractors (company_id, name) values ($1, $2) returning id',
+      [construtoraB, 'Gama B'],
+    )
+    const [contractGamaB] = await sql<{ id: string }>(
+      `insert into contracts (company_id, project_id, contractor_id, number)
+       values ($1, $2, $3, '002/B') returning id`,
+      [construtoraB, obraB, contractorGamaB.id],
+    )
+    contratoGamaB = contractGamaB.id
+
+    // Usuario com dois vinculos: engenharia na A (sem contractor_id) e
+    // empreiteiro na B (contractor_id = Beta B).
+    usuarioMultiplo = await createUser('multi@vista.test', construtoraA, 'engenharia')
+    await sql(
+      `insert into memberships (user_id, company_id, role, contractor_id)
+       values ($1, $2, 'empreiteiro', $3)`,
+      [usuarioMultiplo.userId, construtoraB, contractorBetaB.id],
+    )
+  })
+
+  it('enxerga o contrato da construtora A, onde e engenheiro sem contractor_id', async () => {
+    const { data } = await usuarioMultiplo.client
+      .from('contracts')
+      .select('id')
+      .eq('id', contratoAlfaA)
+    expect(data).toEqual([{ id: contratoAlfaA }])
+  })
+
+  it('enxerga o proprio contrato na construtora B, onde e empreiteiro', async () => {
+    const { data } = await usuarioMultiplo.client
+      .from('contracts')
+      .select('id')
+      .eq('id', contratoBetaB)
+    expect(data).toEqual([{ id: contratoBetaB }])
+  })
+
+  it('nao enxerga o contrato de outro empreiteiro na construtora B', async () => {
+    const { data } = await usuarioMultiplo.client
+      .from('contracts')
+      .select('id')
+      .eq('id', contratoGamaB)
+    expect(data).toEqual([])
+  })
+})
