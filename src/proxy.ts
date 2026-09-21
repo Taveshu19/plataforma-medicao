@@ -51,6 +51,7 @@ export async function proxy(request: NextRequest) {
   if (!user && !ehPublica) {
     const url = request.nextUrl.clone()
     if (host) url.host = host
+    if (isTunnel) url.port = ''
     url.protocol = `${proto}:`
     url.pathname = '/entrar'
     return NextResponse.redirect(url)
@@ -59,6 +60,7 @@ export async function proxy(request: NextRequest) {
   if (user && caminho === '/entrar') {
     const url = request.nextUrl.clone()
     if (host) url.host = host
+    if (isTunnel) url.port = ''
     url.protocol = `${proto}:`
     url.pathname = '/'
     return NextResponse.redirect(url)
