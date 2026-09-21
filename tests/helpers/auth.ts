@@ -86,3 +86,18 @@ export async function cleanup(): Promise<void> {
   }
   await sql('truncate companies cascade')
 }
+
+/** Cria usuario cujo acesso e limitado a uma unica obra. */
+export async function createScopedUser(
+  email: string,
+  companyId: string,
+  projectId: string,
+  role: string,
+): Promise<TestUser> {
+  const user = await createUser(email, companyId, role)
+  await sql('update memberships set project_id = $1 where user_id = $2', [
+    projectId,
+    user.userId,
+  ])
+  return user
+}
