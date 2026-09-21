@@ -44,14 +44,22 @@ export async function proxy(request: NextRequest) {
   const caminho = request.nextUrl.pathname
   const ehPublica = ROTAS_PUBLICAS.some((r) => caminho === r || caminho.startsWith(r + '/'))
 
+  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host')
+  const isTunnel = host?.includes('.lhr.life') || host?.includes('.trycloudflare.com') || host?.includes('.loca.lt')
+  const proto = isTunnel ? 'https' : (request.headers.get('x-forwarded-proto') ?? (request.url.startsWith('https') ? 'https' : 'http'))
+
   if (!user && !ehPublica) {
     const url = request.nextUrl.clone()
+    if (host) url.host = host
+    url.protocol = `${proto}:`
     url.pathname = '/entrar'
     return NextResponse.redirect(url)
   }
 
   if (user && caminho === '/entrar') {
     const url = request.nextUrl.clone()
+    if (host) url.host = host
+    url.protocol = `${proto}:`
     url.pathname = '/'
     return NextResponse.redirect(url)
   }
