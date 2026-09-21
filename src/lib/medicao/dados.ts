@@ -136,3 +136,87 @@ export async function obterRevisaoMedicao(measurementId: string): Promise<ItemRe
     notes: r.notes,
   }))
 }
+
+export interface HistoricoMedicao {
+  id: string
+  protocol: string | null
+  status: string
+  currentLevel: number
+  submittedAt: string | null
+  createdAt: string
+  competence: string
+  totalRequested: number
+  totalApproved: number
+  returnReason?: string | null
+}
+
+export async function listarHistoricoMedicoes(contractId: string): Promise<HistoricoMedicao[]> {
+  const supabase = await createServerSupabase()
+
+  const { data: medicoes, error } = await supabase
+    .from('measurements')
+    .select(`
+      id, protocol, status, current_level, submitted_at, created_at,
+      measurement_periods ( competence ),
+      measurement_items (
+        qty_requested,
+        qty_approved,
+        contract_items ( unit_price )
+      )
+    `)
+    .eq('contract_id', contractId)
+    .order('created_at', { ascending: false })
+
+  if (error || !medicoes) return []
+
+  const idsDevolvidas = medicoes.filter((m) => m.status === 'DEVOLVIDA').map((m) => m.id)
+  const motivosMap = new Map<string, string>()
+
+  if (idsDevolvidas.length > 0) {
+    const { data: audits } = await supabase
+      .from('audit_log')
+      .select('measurement_id, reason')
+      .in('measurement_id', idsDevolvidas)
+      .eq('action', 'DEVOLVIDA')
+      .not('reason', 'is', null)
+      .order('created_at', { ascending: false })
+
+    if (audits) {
+      for (const a of audits) {
+        if (a.measurement_id && a.reason && !motivosMap.has(a.measurement_id)) {
+          motivosMap.set(a.measurement_id, a.reason)
+        }
+      }
+    }
+  }
+
+  return medicoes.map((m: any) => {
+    const period = m.measurement_periods as any
+    const items = (m.measurement_items as any[]) || []
+
+    const totalRequested = items.reduce((sum, it) => {
+      const price = Number(it.contract_items?.unit_price ?? 0)
+      return sum + Number(it.qty_requested) * price
+    }, 0)
+
+    const totalApproved = items.reduce((sum, it) => {
+      const price = Number(it.contract_items?.unit_price ?? 0)
+      const qty = it.qty_approved !== null ? Number(it.qty_approved) : Number(it.qty_requested)
+      return sum + qty * price
+    }, 0)
+
+    return {
+      id: m.id,
+      protocol: m.protocol,
+      status: m.status,
+      currentLevel: m.current_level,
+      submittedAt: m.submitted_at,
+      createdAt: m.created_at,
+      competence: period?.competence ?? '',
+      totalRequested,
+      totalApproved,
+      returnReason: motivosMap.get(m.id) ?? null,
+    }
+  })
+}
+

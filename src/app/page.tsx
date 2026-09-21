@@ -86,13 +86,12 @@ export default async function Home() {
             Fazer minha medição
           </button>
         )}
-        <button
-          type="button"
-          disabled
-          className="w-full rounded-xl bg-white px-4 py-5 text-base font-semibold text-slate-900 ring-1 ring-slate-300 disabled:opacity-40"
+        <Link
+          href="/medicoes"
+          className="flex w-full items-center justify-center rounded-xl bg-white px-4 py-5 text-base font-semibold text-slate-900 ring-1 ring-slate-300 hover:bg-slate-50"
         >
           Medições anteriores
-        </button>
+        </Link>
         <button
           type="button"
           disabled
