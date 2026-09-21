@@ -162,5 +162,46 @@ begin
     from contract_items ci where ci.id = v_item;
   end loop;
 
+  -- Usuarios de demonstracao. Senha de todos: demo1234
+  for v_servico in
+    select * from (values
+      ('alfa@demo.test',       'Jose da Silva',    'empreiteiro'::app_role, v_alfa),
+      ('beta@demo.test',       'Marcos Beta',      'empreiteiro'::app_role, v_beta),
+      ('engenharia@demo.test', 'Carlos Almeida',   'engenharia'::app_role,  null::uuid),
+      ('gerencia@demo.test',   'Patricia Moraes',  'gerencia'::app_role,    null::uuid)
+    ) as t(email, nome, papel, contratado)
+  loop
+    insert into auth.users (
+      instance_id, id, aud, role, email, encrypted_password,
+      email_confirmed_at, created_at, updated_at,
+      raw_app_meta_data, raw_user_meta_data,
+      confirmation_token, recovery_token,
+      email_change_token_new, email_change,
+      email_change_token_current, reauthentication_token
+    )
+    values (
+      '00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated',
+      'authenticated', v_servico.email, crypt('demo1234', gen_salt('bf')),
+      now(), now(), now(),
+      '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb,
+      '', '', '', '', '', ''
+    )
+    returning id into v_meas;
+
+    insert into auth.identities (
+      id, user_id, provider_id, identity_data, provider, created_at, updated_at
+    )
+    values (
+      gen_random_uuid(), v_meas, v_meas::text,
+      format('{"sub":"%s","email":"%s","email_verified":true}', v_meas, v_servico.email)::jsonb,
+      'email', now(), now()
+    );
+
+    insert into profiles (id, full_name) values (v_meas, v_servico.nome);
+
+    insert into memberships (user_id, company_id, role, contractor_id)
+    values (v_meas, v_company, v_servico.papel, v_servico.contratado);
+  end loop;
+
   raise notice 'Seed aplicado: empresa %, obra %', v_company, v_project;
 end $$;
