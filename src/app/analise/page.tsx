@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { obterPerfilUsuario, listarMedicoesPorStatus } from '@/lib/aprovacao/dados'
 import { TabelaMedicoes } from './components/TabelaMedicoes'
@@ -34,14 +35,23 @@ export default async function PainelAnalisePage() {
           </p>
         </div>
 
-        <form action="/sair" method="post">
-          <button
-            type="submit"
-            className="text-xs font-medium text-slate-500 underline underline-offset-4 hover:text-slate-900"
+        <div className="flex items-center gap-4">
+          <Link
+            href="/analise/prazos"
+            className="rounded-xl bg-white px-3 py-2 text-xs font-semibold text-slate-700 ring-1 ring-slate-300 transition hover:ring-slate-400"
           >
-            Sair
-          </button>
-        </form>
+            Prazos da medição
+          </Link>
+
+          <form action="/sair" method="post">
+            <button
+              type="submit"
+              className="text-xs font-medium text-slate-500 underline underline-offset-4 hover:text-slate-900"
+            >
+              Sair
+            </button>
+          </form>
+        </div>
       </header>
 
       <section className="mt-6">
