@@ -16,35 +16,38 @@
 
 ## 2. Estado exato
 
-**Branch:** `master`. Árvore limpa. **28 commits.**
-**Testes:** 117 na suíte principal + 12 no seed = **129 passando**. 5 testes E2E do Playwright passando em perfil celular real. `tsc --noEmit` limpo.
-**Migrations:** 001 a 013. A próxima livre é a `014`.
+**Branch:** `master`. Árvore limpa. **36 commits.**
+**Testes:** 156 na suíte principal + 12 no seed = **168 passando**. 6 testes E2E do Playwright passando em perfil celular real (Pixel 7). `tsc --noEmit` limpo.
+**Migrations:** 001 a 017. A próxima livre é a `018`.
 
 ### Plano 1 — Fundação de dados e regras: ✅ COMPLETO
-
-12 migrations, RLS de leitura em tudo, regra de saldo, máquina de estados configurável, auditoria, reabertura por empreiteiro, NF com tolerância, seed com obra de 20 casas. Revisado tarefa a tarefa e mergeado em `master`.
+12 migrations, RLS de leitura em tudo, regra de saldo, máquina de estados configurável, auditoria, reabertura por empreiteiro, NF com tolerância, seed com obra de 20 casas.
 
 ### Plano 2 — Área do empreiteiro (auth e home): ✅ COMPLETO (6 de 6)
+Clientes Supabase e proxy de sessão, usuários de demonstração no seed, resumo financeiro do contrato (migration 013), tela de login, home do empreiteiro, suíte E2E de login → home.
+
+### Plano 3 — Fluxo de medição do empreiteiro: ✅ COMPLETO (7 de 7)
 
 | Task | Estado | Commits |
 |---|---|---|
-| 1 — Clientes Supabase e proxy de sessão | ✅ completa, revisada, 1 correção aplicada | `af30f3f`, `12cde10` |
-| 2 — Usuários de demonstração no seed | ✅ revisada e aprovada | `443c2a6` |
-| 3 — Resumo financeiro do contrato | ✅ completa, revisada (migration 013) | `da98fc4` |
-| 4 — Tela de login | ✅ completa, revisada | `c44c641` |
-| 5 — Home do empreiteiro | ✅ completa, revisada | `eae2427` |
-| 6 — E2E do fluxo login → home | ✅ completa, revisada (Playwright Pixel 7) | `91bb3d9` |
+| 1 — Policies de escrita RLS e submissão | ✅ completa (migration 014, locks e triggers security definer) | `f517d05` |
+| 2 — Consultas de apoio e navegação de locais | ✅ completa (migration 015, helpers tipados de apoio) | `d727a5d` |
+| 3 — Conversor metragem ⇄ percentual | ✅ completa (módulo puro e determinístico relativo ao local) | `5452d1b` |
+| 4 — Seleção de etapas e locais (`/medicao`) | ✅ completa (agrupamento, busca instantânea e badges) | `3225d7b` |
+| 5 — Preenchimento de serviços (`/medicao/local/[unitId]`) | ✅ completa (migration 016, LinhaServico com alternador e Server Action) | `b2c655b` |
+| 6 — Revisão e envio formal com protocolo | ✅ completa (`/medicao/revisao`, modal e protocolo sequencial) | `6242614` |
+| 7 — Suíte E2E móvel e protocolo resiliente | ✅ completa (migration 017, Playwright Pixel 7 ponta a ponta) | `2ac477b` |
 
 ---
 
-## 3. Próximos Passos (Avançar para o Plano 3)
+## 3. Próximos Passos (Avançar para o Plano 4)
 
-O Plano 2 está 100% concluído, testado (129 unitários/integração + 5 E2E móveis) e verificado.
-A próxima ação é iniciar a especificação/planejamento do **Plano 3 — Fluxo de medição**:
-- Policies de escrita (insert/update de medições e itens).
-- Navegação hierárquica etapa → local → serviços.
-- Tela de preenchimento com alternador metragem ⇄ percentual.
-- Revisão e envio com protocolo sequencial e advisory lock.
+O Plano 3 está 100% concluído, com build verificado, 168 testes automatizados e 6 testes E2E móveis passando.
+A próxima ação é planejar o **Plano 4 — Painel de Análise e Aprovação da Engenharia (ou Histórico e Acompanhamento do Empreiteiro)**:
+- Fluxo de análise de medições enviadas (`EM_ANALISE`).
+- Ajuste de quantidade aprovada (`qty_approved`) pela engenharia (nível 1).
+- Devolução de medição com justificativa (`DEVOLVIDA`) vs Avanço no workflow de aprovação (`APROVADA`).
+- Histórico de medições anteriores do empreiteiro.
 
 
 ---
