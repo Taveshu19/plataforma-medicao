@@ -31,7 +31,7 @@ async function createMeasurementInNewPeriod(
 ): Promise<string> {
   const [period] = await sql<{ id: string }>(
     `insert into measurement_periods (company_id, project_id, competence, opens_at, closes_at)
-     values ($1, $2, $3::date, $3::date, $3::date + interval '9 days')
+     values ($1, $2, $3::date, now() - interval '1 day', now() + interval '9 days')
      returning id`,
     [scenario.companyId, scenario.projectId, competence],
   )

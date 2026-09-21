@@ -53,7 +53,7 @@ export async function buildScenario(): Promise<Scenario> {
   )
   const [period] = await sql<{ id: string }>(
     `insert into measurement_periods (company_id, project_id, competence, opens_at, closes_at)
-     values ($1, $2, '2026-09-01', '2026-09-01 00:00+00', '2026-09-10 23:59+00')
+     values ($1, $2, '2026-09-01', now() - interval '1 day', now() + interval '9 days')
      returning id`,
     [companyId, project.id],
   )
@@ -78,8 +78,8 @@ export async function createMeasurement(
 ): Promise<string> {
   const [m] = await sql<{ id: string }>(
     `insert into measurements (company_id, period_id, contract_id, status)
-     values ($1, $2, $3, $4::measurement_status) returning id`,
-    [s.companyId, s.periodId, s.contractId, status],
+     values ($1, $2, $3, 'RASCUNHO') returning id`,
+    [s.companyId, s.periodId, s.contractId],
   )
   for (const item of items) {
     await sql(
@@ -87,6 +87,12 @@ export async function createMeasurement(
          (company_id, measurement_id, contract_item_id, qty_requested, qty_approved)
        values ($1, $2, $3, $4, $5)`,
       [s.companyId, m.id, item.contractItemId, item.requested, item.approved ?? null],
+    )
+  }
+  if (status !== 'RASCUNHO') {
+    await sql(
+      `update measurements set status = $2::measurement_status where id = $1`,
+      [m.id, status],
     )
   }
   return m.id

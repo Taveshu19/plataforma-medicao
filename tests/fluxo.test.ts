@@ -173,7 +173,7 @@ describe('integracao com regra de saldo no envio', () => {
     // Helper para criar medicao em periodo novo
     const [period2] = await sql<{ id: string }>(
       `insert into measurement_periods (company_id, project_id, competence, opens_at, closes_at)
-       values ($1, $2, '2026-10-01', '2026-10-01 00:00+00', '2026-10-10 23:59+00') returning id`,
+       values ($1, $2, '2026-10-01', now() - interval '1 day', now() + interval '9 days') returning id`,
       [s.companyId, s.projectId],
     )
     // Rascunho A: 60 m2 (saldo total 86)
