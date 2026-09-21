@@ -16,9 +16,9 @@
 
 ## 2. Estado exato
 
-**Branch:** `master`. Árvore limpa. **45 commits.**
-**Testes:** 178 na suíte principal + 12 no seed = **190 passando**. 8 testes E2E do Playwright passando em perfil celular real (Pixel 7). `npm run build` e `npx tsc --noEmit` limpos.
-**Migrations:** 001 a 019.
+**Branch:** `master`. Árvore limpa. **46 commits.**
+**Testes:** 186 na suíte principal + 12 no seed = **198 passando**. 10 testes E2E do Playwright passando em perfil celular real (Pixel 7). `npm run build` (12 rotas) e `npx tsc --noEmit` limpos.
+**Migrations:** 001 a 020.
 
 ### Plano 1 — Fundação de dados e regras: ✅ COMPLETO
 12 migrations, RLS de leitura em tudo, regra de saldo, máquina de estados configurável, auditoria, reabertura por empreiteiro, NF com tolerância, seed com obra de 20 casas.
@@ -60,20 +60,29 @@ Clientes Supabase e proxy de sessão, usuários de demonstração no seed, resum
 | 5 — Sincronização do extrato e quitação no histórico | ✅ completa (saldo e status `PAGA` sincronizados no contrato e na listagem) | `57c77ee` |
 | 6 — Suíte E2E do ciclo fiscal e financeiro | ✅ completa (`e2e/faturamento.spec.ts`, 8/8 testes E2E verdes) | `57c77ee` |
 
+### Polimento e Fechamento do Produto: ✅ COMPLETO (6 de 6)
+
+| Task | Estado | Commits |
+|---|---|---|
+| 1 — Migration 020 (auditoria, espelho e visão de contrato) | ✅ completa (`020_auditoria_espelho_e_contrato.sql`, 4 RPCs de alto nível) | `c11945f` |
+| 2 — Tela "Meu Contrato" (`/contrato`) | ✅ completa (itens agrupados por etapa/local, barras de progresso, busca e ativação na Home) | `c11945f` |
+| 3 — Linha do tempo de auditoria na engenharia | ✅ completa (`/analise/[id]`, histórico visual de ajustes, devoluções com motivo e aprovações) | `c11945f` |
+| 4 — Espelho oficial de medição com impressão | ✅ completa (`/medicoes/[id]/espelho`, cabeçalho oficial, itens, subtotais e assinaturas) | `c11945f` |
+| 5 — Abas de status no painel de aprovações | ✅ completa (`/analise`, abas "Em análise", "Aprovadas/Pagas", "Devolvidas" e "Todas") | `c11945f` |
+| 6 — Suíte E2E do fluxo de contrato e espelho | ✅ completa (`e2e/espelho-e-contrato.spec.ts`, 10/10 testes E2E verdes) | `c11945f` |
+
 ---
 
-## 3. Próximos Passos (Evolução pós-MVP)
+## 3. Próximos Passos (Demonstração e Homologação)
 
-Os Planos 1, 2, 3, 4 e 5 estão 100% concluídos, cobrindo todo o ciclo operacional, fiscal e financeiro da especificação:
-1. **Medição do Empreiteiro:** login, seleção de locais, conversor metragem ⇄ %, salvamento seguro em rascunho e envio oficial com protocolo sequencial anti-colisão.
-2. **Aprovação da Engenharia:** painel corporativo, rebalanceamento de quantidades, devolução com motivo obrigatório e reabertura com correção.
-3. **Faturamento e Financeiro:** emissão e anexo de NF (PDF) pelo empreiteiro com margem de tolerância, conferência fiscal com aprovação ou rejeição, liquidação financeira e atualização do extrato.
+O MVP e seu polimento estão 100% concluídos:
+1. **Medição do Empreiteiro:** login, extrato financeiro, "Meu Contrato" com saldos por local, seleção de locais, alternador metragem ⇄ %, salvamento seguro em rascunho, envio oficial com protocolo sequencial anti-colisão e espelho de medição para impressão.
+2. **Aprovação da Engenharia:** painel corporativo com abas por status e busca rápida, rebalanceamento de quantidades solicitado vs aprovado, devolução com motivo obrigatório, histórico cronológico de auditoria e geração de espelho para assinatura.
+3. **Faturamento e Financeiro:** emissão e anexo de NF (PDF) pelo empreiteiro com margem de tolerância, conferência fiscal com aprovação ou rejeição formal, liquidação financeira e quitação no extrato.
 
-Próximos refinamentos recomendados:
-- **Exportação de Documentos:** Geração de espelho de medição em PDF para assinatura física ou digital.
-- **Notificações em Tempo Real:** Alertas automáticos (e-mail / WhatsApp / push) para avisar o empreiteiro sobre devoluções ou liberação para emissão de NF.
-- **Filtros e Relatórios Financeiros:** Filtros avançados por competência, obra e empreiteiro no painel `/faturamento`.
-- **Homologação e Deploy:** Configuração do pipeline de CI/CD para deploy em ambiente de staging (conforme restrição de conta Netlify na seção 10).
+Próximos passos para evolução comercial:
+- **Importador de Contratos (Excel / ERP):** Conforme seção 3 da spec de design, este é o primeiro item após o MVP (importar planilhas do Sienge, TOTVS ou SAP).
+- **Deploy:** Configuração da esteira de deploy em ambiente de staging (conforme restrição de conta Netlify na seção 10).
 
 
 ---
