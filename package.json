@@ -12,6 +12,7 @@
     "test:all": "npm run test && npm run test:seed",
     "test:watch": "vitest",
     "db:reset": "npx supabase db reset",
+    "types:db": "npx supabase gen types typescript --local > src/types/database.types.ts",
     "e2e": "playwright test"
   },
   "dependencies": {
