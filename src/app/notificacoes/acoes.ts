@@ -12,7 +12,7 @@ export async function marcarAvisosLidosAction(): Promise<{ success: boolean }> {
 
   if (!user) return { success: false }
 
-  const { error } = await supabase.rpc('mark_notifications_read', { p_ids: null })
+  const { error } = await supabase.rpc('mark_notifications_read', { p_ids: undefined })
   if (error) return { success: false }
 
   revalidatePath('/notificacoes')

@@ -93,8 +93,8 @@ export async function enviarNotaFiscalAction(
     p_number: input.number.trim(),
     p_issued_on: input.issuedOn,
     p_amount: input.amount,
-    p_pdf: input.pdfPath ?? null,
-    p_xml: input.xmlPath ?? null,
+    p_pdf: input.pdfPath ?? undefined,
+    p_xml: input.xmlPath ?? undefined,
   })
 
   if (error) {

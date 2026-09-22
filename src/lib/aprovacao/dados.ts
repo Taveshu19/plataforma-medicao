@@ -243,7 +243,7 @@ export async function listarMedicoesPorStatus(
 ): Promise<MedicaoPendente[]> {
   const supabase = await createServerSupabase()
   const { data, error } = await supabase.rpc('get_company_measurements', {
-    p_status: status ?? null,
+    p_status: status ?? undefined,
   })
 
   if (error || !data) return []

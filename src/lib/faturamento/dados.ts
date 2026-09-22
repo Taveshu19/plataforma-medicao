@@ -53,12 +53,13 @@ export async function obterDadosMedicaoParaNF(
     p_measurement_id: measurementId,
   })
 
-  if (error || !data || !data.measurement) {
+  const payload = data as any
+  if (error || !payload || !payload.measurement) {
     return null
   }
 
-  const m = data.measurement
-  const inv = data.invoice
+  const m = payload.measurement
+  const inv = payload.invoice
 
   return {
     id: m.id,

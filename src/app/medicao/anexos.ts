@@ -32,7 +32,7 @@ export async function listarAnexos(
 
   const { data, error } = await supabase.rpc('get_measurement_files', {
     p_measurement_id: measurementId,
-    p_contract_item_id: contractItemId ?? null,
+    p_contract_item_id: contractItemId ?? undefined,
   })
 
   if (error || !data) return []
@@ -70,6 +70,10 @@ export async function anexarFotoAction(
   contractItemId: string | null,
   formData: FormData,
 ): Promise<AnexoResultado> {
+  if (!contractItemId) {
+    return { success: false, error: 'Item de contrato não informado.' }
+  }
+
   const arquivo = formData.get('foto') as File | null
   if (!arquivo || arquivo.size === 0) {
     return { success: false, error: 'Nenhuma foto selecionada.' }

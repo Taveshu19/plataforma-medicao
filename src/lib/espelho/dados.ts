@@ -51,5 +51,5 @@ export async function obterEspelhoMedicao(
     return null
   }
 
-  return data as EspelhoMedicao
+  return data as unknown as EspelhoMedicao
 }

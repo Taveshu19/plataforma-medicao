@@ -54,15 +54,16 @@ export async function obterOuCriarRascunho(contractId: string): Promise<Rascunho
     p_contract_id: contractId,
   })
 
-  if (error || !data || data.error) {
+  const res = data as any
+  if (error || !res || res.error) {
     return null
   }
 
   return {
-    id: data.id,
-    status: data.status,
-    protocol: data.protocol,
-    periodId: data.period_id,
+    id: res.id,
+    status: res.status,
+    protocol: res.protocol,
+    periodId: res.period_id,
   }
 }
 
