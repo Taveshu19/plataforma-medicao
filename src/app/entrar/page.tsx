@@ -72,6 +72,33 @@ export default function Entrar() {
             {pendente ? 'Entrando…' : 'Entrar'}
           </Button>
         </form>
+
+        <div className="mt-8 border-t border-slate-200 pt-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 text-center">
+            Acesso Rápido de Teste (1 clique)
+          </p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <a
+              href="/demo/alfa"
+              className="flex items-center justify-center rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-center"
+            >
+              📱 Empreiteiro
+            </a>
+            <a
+              href="/demo/engenharia"
+              className="flex items-center justify-center rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-center"
+            >
+              💻 Engenharia
+            </a>
+            <a
+              href="/demo/gerencia"
+              className="flex items-center justify-center rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-center"
+            >
+              💼 Gerência
+            </a>
+          </div>
+        </div>
+
         <p className="login-footer">Seu acesso é fornecido pela construtora.<br />Se precisar de ajuda, fale com a equipe da sua obra.</p>
       </div></div>
     </main>

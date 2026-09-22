@@ -12,7 +12,7 @@ export async function entrar(
   formData: FormData,
 ): Promise<EstadoLogin> {
   const email = String(formData.get('email') ?? '').trim()
-  const senha = String(formData.get('senha') ?? '')
+  const senha = String(formData.get('senha') ?? '').trim()
 
   if (!email || !senha) {
     return { erro: 'Informe o e-mail e a senha.' }
@@ -29,3 +29,20 @@ export async function entrar(
 
   redirect('/')
 }
+
+export async function entrarComo(perfil: 'alfa' | 'engenharia' | 'gerencia' | 'beta'): Promise<EstadoLogin> {
+  const contas: Record<string, string> = {
+    alfa: 'alfa@demo.test',
+    engenharia: 'engenharia@demo.test',
+    gerencia: 'gerencia@demo.test',
+    beta: 'beta@demo.test',
+  }
+  const email = contas[perfil] ?? 'alfa@demo.test'
+  const supabase = await createServerSupabase()
+  const { error } = await supabase.auth.signInWithPassword({ email, password: 'demo1234' })
+  if (error) {
+    return { erro: 'Erro ao conectar perfil demonstrativo.' }
+  }
+  redirect(perfil === 'engenharia' ? '/analise' : perfil === 'gerencia' ? '/faturamento' : '/')
+}
+

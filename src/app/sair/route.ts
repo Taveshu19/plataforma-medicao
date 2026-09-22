@@ -11,3 +11,7 @@ export async function POST(request: NextRequest) {
   const baseUrl = host ? `${protocol}://${isTunnel ? cleanHost : host}` : request.url
   return NextResponse.redirect(new URL('/entrar', baseUrl), { status: 303 })
 }
+
+export async function GET(request: NextRequest) {
+  return POST(request)
+}
