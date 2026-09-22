@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { ClipboardCheck, Clock3, Undo2 } from 'lucide-react'
+import { Badge } from '@/components/ui'
 import Link from 'next/link'
 import { MedicaoPendente } from '@/lib/aprovacao/dados'
 import { formatarReais, competenciaPorExtenso } from '@/app/formato'
@@ -99,8 +101,13 @@ export function TabelaMedicoes({ medicoes }: TabelaMedicoesProps) {
 
   return (
     <div className="space-y-4">
+      <div className="office-stats" aria-label="Resumo das medições">
+        <div><Clock3 size={20} aria-hidden="true" /><span>Aguardando análise<strong>{emAnaliseCount.toString().padStart(2, '0')}</strong></span><small>Para conferir</small></div>
+        <div><ClipboardCheck size={20} aria-hidden="true" /><span>Aprovadas / Pagas<strong>{aprovadasCount.toString().padStart(2, '0')}</strong></span><small>Etapas concluídas</small></div>
+        <div><Undo2 size={20} aria-hidden="true" /><span>Devolvidas<strong>{devolvidasCount.toString().padStart(2, '0')}</strong></span><small>Aguardando correção</small></div>
+      </div>
       {/* Abas por Status */}
-      <div className="flex border-b border-slate-200 text-xs font-semibold">
+      <div className="status-tabs flex flex-wrap border-b border-slate-200 text-xs font-semibold">
         <button
           type="button"
           onClick={() => setAbaAtiva('EM_ANALISE')}
@@ -218,15 +225,11 @@ export function TabelaMedicoes({ medicoes }: TabelaMedicoesProps) {
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-base font-bold text-slate-900">
                         {med.protocol}
                       </span>
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${badge.estilo}`}
-                      >
-                        {badge.rotulo}
-                      </span>
+                      <Badge className={badge.estilo}>{badge.rotulo}</Badge>
                     </div>
                     <h3 className="mt-1 text-sm font-bold text-slate-800">
                       {med.contractorName}

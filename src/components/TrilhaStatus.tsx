@@ -1,3 +1,5 @@
+import { Card } from '@/components/ui'
+import { Check, X } from 'lucide-react'
 import type { PassoTrilha } from '@/app/trilha'
 
 const CORES = {
@@ -31,14 +33,10 @@ function Marcador({ estado }: { estado: PassoTrilha['estado'] }) {
       className={`relative z-10 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ring-2 ${cor.bolinha}`}
     >
       {estado === 'concluido' && (
-        <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-        </svg>
+        <Check size={12} className="text-white" />
       )}
       {estado === 'devolvido' && (
-        <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <X size={12} className="text-white" />
       )}
       {estado === 'atual' && <span className="h-2 w-2 rounded-full bg-slate-900" />}
     </span>
@@ -55,7 +53,7 @@ export function TrilhaStatus({
   if (passos.length === 0) return null
 
   return (
-    <section
+    <Card
       data-testid="trilha-status"
       className="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
     >
@@ -91,6 +89,6 @@ export function TrilhaStatus({
           )
         })}
       </ol>
-    </section>
+    </Card>
   )
 }

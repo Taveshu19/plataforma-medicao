@@ -15,7 +15,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run dev',
-    url: 'http://127.0.0.1:3000/entrar',
+    url: (process.env.BASE_URL || 'http://127.0.0.1:3000') + '/entrar',
     reuseExistingServer: true,
     timeout: 120_000,
   },

@@ -9,6 +9,7 @@ test.describe('ciclo fiscal e financeiro (emissao de NF, aprovacao e pagamento)'
   test('fluxo: medicao aprovada -> empreiteiro anexa NF -> construtora aprova NF -> construtora liquida pagamento -> extrato atualizado', async ({
     page,
   }) => {
+    test.setTimeout(60_000)
     // 1. Empreiteiro Alfa submete medição
     await page.goto('/entrar')
     await page.getByLabel('E-mail').fill('alfa@demo.test')
@@ -56,16 +57,13 @@ test.describe('ciclo fiscal e financeiro (emissao de NF, aprovacao e pagamento)'
     await page.getByRole('button', { name: 'Entrar' }).click()
     await expect(page).toHaveURL('/analise')
 
-    // Nível 2 (Coordenação/Gerência)
-    if (await page.getByTestId(`card-medicao-${protocolo}`).isVisible()) {
-      await page.getByTestId(`card-medicao-${protocolo}`).getByRole('link', { name: 'Analisar medição' }).click()
-      await page.getByRole('button', { name: 'Aprovar medição' }).click()
-      await expect(page).toHaveURL('/analise')
-    }
-
-    // Nível 3 (Gerência) se ainda houver
-    if (await page.getByTestId(`card-medicao-${protocolo}`).isVisible()) {
-      await page.getByTestId(`card-medicao-${protocolo}`).getByRole('link', { name: 'Analisar medição' }).click()
+    // O seed tem três níveis. Aguardar o cartão evita pular aprovações
+    // enquanto o estado de carregamento ainda está sendo exibido.
+    for (const nivel of [2, 3]) {
+      const card = page.getByTestId(`card-medicao-${protocolo}`)
+      await expect(card).toBeVisible()
+      await expect(card.getByText(`Nível ${nivel} • Em análise`)).toBeVisible()
+      await card.getByRole('link', { name: 'Analisar medição' }).click()
       await page.getByRole('button', { name: 'Aprovar medição' }).click()
       await expect(page).toHaveURL('/analise')
     }

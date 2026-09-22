@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Marca } from '@/components/Marca'
 import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { obterPerfilUsuario } from '@/lib/aprovacao/dados'
@@ -31,12 +32,7 @@ export default async function PainelFaturamentoPage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-6">
             <Link href="/analise" className="flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 font-black text-white shadow-xs">
-                O
-              </span>
-              <span className="text-base font-bold tracking-tight text-slate-900">
-                Portal da Obra
-              </span>
+              <Marca />
             </Link>
 
             {/* Navegação Corporativa */}

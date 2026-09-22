@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { StepHeader } from '@/components/ui'
 import { redirect } from 'next/navigation'
 import { carregarContexto, competenciaPorExtenso, formatarReais } from '../contexto'
 import { obterOuCriarRascunho, listarLocaisMedicao } from '@/lib/medicao/dados'
@@ -57,6 +58,7 @@ export default async function MedicaoPage() {
 
   return (
     <main className="mx-auto w-full max-w-md px-5 pb-24 pt-6">
+      <StepHeader current={1} />
       <header className="mb-6">
         <Link
           href="/"
@@ -99,7 +101,7 @@ export default async function MedicaoPage() {
       <ListaLocais locais={locais} />
 
       {/* Barra de ação inferior */}
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 bg-white/95 p-4 backdrop-blur-sm">
+      <div className="action-dock fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 bg-white/95 p-4 backdrop-blur-sm">
         <div className="mx-auto max-w-md">
           {totalItensMedidos > 0 ? (
             <Link

@@ -42,7 +42,7 @@ export default async function AnaliseDetalhePage({ params }: PageProps) {
   }
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-5 pb-32 pt-6">
+    <main className="mx-auto w-full max-w-6xl px-5 pb-32 pt-6">
       <header className="mb-6">
         <div className="flex items-center justify-between">
           <Link

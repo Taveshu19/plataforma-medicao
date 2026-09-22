@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Marca } from '@/components/Marca'
 import { contarNaoLidos } from '@/lib/notificacoes/dados'
 import { redirect } from 'next/navigation'
 import { obterPerfilUsuario, listarMedicoesPorStatus } from '@/lib/aprovacao/dados'
@@ -16,7 +17,9 @@ export default async function PainelAnalisePage() {
   const medicoes = await listarMedicoesPorStatus()
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-5 pb-16 pt-8">
+    <>
+    <div className="product-bar"><div className="product-bar-inner"><Marca /><span className="product-bar-caption">Gestão da construtora</span></div></div>
+    <main className="office-workspace mx-auto w-full px-5 pb-16 pt-8">
       <header className="flex items-start justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
           <div className="flex items-center gap-2">
@@ -71,6 +74,6 @@ export default async function PainelAnalisePage() {
       <section className="mt-6">
         <TabelaMedicoes medicoes={medicoes} />
       </section>
-    </main>
+    </main></>
   )
 }

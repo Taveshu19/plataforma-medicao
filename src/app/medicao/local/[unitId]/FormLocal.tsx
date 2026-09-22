@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { Button } from '@/components/ui'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { StepHeader } from '@/components/ui'
 import { ServicoLocal } from '@/lib/medicao/dados'
 import { LinhaServico } from './LinhaServico'
 import { validateQty, calcSubtotal } from '@/app/medicao/conversao'
@@ -98,6 +100,7 @@ export function FormLocal({
 
   return (
     <div className="space-y-6">
+      <StepHeader current={2} />
       <header>
         <Link
           href="/medicao"
@@ -144,7 +147,7 @@ export function FormLocal({
       </div>
 
       {/* Barra de ação inferior fixa */}
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 bg-white/95 p-4 backdrop-blur-sm">
+      <div className="action-dock fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 bg-white/95 p-4 backdrop-blur-sm">
         <div className="mx-auto max-w-md">
           <div className="mb-2 flex items-center justify-between text-xs">
             <span className="text-slate-500">
@@ -155,7 +158,7 @@ export function FormLocal({
             </span>
           </div>
 
-          <button
+          <Button
             type="button"
             onClick={handleSalvar}
             disabled={salvando || temErroSaldo}
@@ -166,7 +169,7 @@ export function FormLocal({
               : temErroSaldo
               ? 'Corrija os valores com saldo excedido'
               : 'Salvar e voltar aos locais'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

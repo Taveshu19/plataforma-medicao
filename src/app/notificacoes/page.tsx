@@ -1,19 +1,20 @@
 import Link from 'next/link'
+import { CalendarDays, Clock3, Inbox, Undo2, Check, X, FileText, Wallet, Bell, type LucideIcon } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { listarAvisos, contarNaoLidos } from '@/lib/notificacoes/dados'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { BotaoMarcarLidos } from './BotaoMarcarLidos'
 
-const ICONE: Record<string, { cor: string; letra: string }> = {
-  PERIODO_ABERTO: { cor: 'bg-emerald-100 text-emerald-700', letra: '↗' },
-  PRAZO_PROXIMO: { cor: 'bg-amber-100 text-amber-700', letra: '!' },
-  MEDICAO_RECEBIDA: { cor: 'bg-slate-200 text-slate-700', letra: '↓' },
-  MEDICAO_DEVOLVIDA: { cor: 'bg-rose-100 text-rose-700', letra: '↺' },
-  MEDICAO_APROVADA: { cor: 'bg-emerald-100 text-emerald-700', letra: '✓' },
-  MEDICAO_CANCELADA: { cor: 'bg-slate-200 text-slate-600', letra: '×' },
-  NF_RECEBIDA: { cor: 'bg-slate-200 text-slate-700', letra: '⌁' },
-  NF_APROVADA: { cor: 'bg-emerald-100 text-emerald-700', letra: '✓' },
-  PAGAMENTO: { cor: 'bg-emerald-100 text-emerald-700', letra: '$' },
+const ICONE: Record<string, { cor: string; icon: LucideIcon }> = {
+  PERIODO_ABERTO: { cor: 'bg-emerald-100 text-emerald-700', icon: CalendarDays },
+  PRAZO_PROXIMO: { cor: 'bg-amber-100 text-amber-700', icon: Clock3 },
+  MEDICAO_RECEBIDA: { cor: 'bg-slate-200 text-slate-700', icon: Inbox },
+  MEDICAO_DEVOLVIDA: { cor: 'bg-rose-100 text-rose-700', icon: Undo2 },
+  MEDICAO_APROVADA: { cor: 'bg-emerald-100 text-emerald-700', icon: Check },
+  MEDICAO_CANCELADA: { cor: 'bg-slate-200 text-slate-600', icon: X },
+  NF_RECEBIDA: { cor: 'bg-slate-200 text-slate-700', icon: FileText },
+  NF_APROVADA: { cor: 'bg-emerald-100 text-emerald-700', icon: Check },
+  PAGAMENTO: { cor: 'bg-emerald-100 text-emerald-700', icon: Wallet },
 }
 
 function quando(iso: string): string {
@@ -67,7 +68,8 @@ export default async function NotificacoesPage() {
       ) : (
         <ul className="space-y-2">
           {avisos.map((aviso) => {
-            const icone = ICONE[aviso.kind] ?? { cor: 'bg-slate-200 text-slate-700', letra: '•' }
+            const icone = ICONE[aviso.kind] ?? { cor: 'bg-slate-200 text-slate-700', icon: Bell }
+            const Icone = icone.icon
             const naoLido = aviso.readAt === null
             const conteudo = (
               <div
@@ -79,7 +81,7 @@ export default async function NotificacoesPage() {
                   aria-hidden
                   className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${icone.cor}`}
                 >
-                  {icone.letra}
+                  <Icone size={18} strokeWidth={1.8} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-3">

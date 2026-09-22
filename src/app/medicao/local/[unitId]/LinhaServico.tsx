@@ -76,7 +76,7 @@ export function LinhaServico({
   return (
     <article
       data-testid={`linha-servico-${servico.contractItemId}`}
-      className={`rounded-2xl bg-white p-4 shadow-sm ring-1 transition ${
+      className={`service-card rounded-2xl bg-white p-4 shadow-sm ring-1 transition ${
         !validacao.valid
           ? 'ring-rose-400 bg-rose-50/20'
           : qty > 0
@@ -104,7 +104,7 @@ export function LinhaServico({
       </div>
 
       {/* Referências de quantidade e saldo */}
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+      <div className="quantity-reference text-xs text-slate-600">
         <div>
           <span className="text-slate-500">Total no local: </span>
           <span className="font-semibold text-slate-800">
@@ -120,12 +120,13 @@ export function LinhaServico({
       </div>
 
       {/* Seletor de modo e campo de entrada */}
-      <div className="mt-4 flex items-center justify-between gap-3">
+      <div className="quantity-entry flex items-center justify-between gap-3">
         {/* Toggle Metragem / % */}
         <div className="inline-flex rounded-lg bg-slate-100 p-0.5 text-xs font-medium text-slate-600">
           <button
             type="button"
             onClick={() => alternarModo('qty')}
+            aria-pressed={modo === 'qty'}
             className={`rounded-md px-2.5 py-1.5 transition ${
               modo === 'qty'
                 ? 'bg-white font-semibold text-slate-900 shadow-sm'
@@ -137,6 +138,7 @@ export function LinhaServico({
           <button
             type="button"
             onClick={() => alternarModo('percent')}
+            aria-pressed={modo === 'percent'}
             className={`rounded-md px-2.5 py-1.5 transition ${
               modo === 'percent'
                 ? 'bg-white font-semibold text-slate-900 shadow-sm'
@@ -152,6 +154,8 @@ export function LinhaServico({
           {modo === 'qty' ? (
             <div className="relative">
               <input
+                aria-label={`${servico.serviceName} — ${servico.unit}`}
+                aria-invalid={!validacao.valid}
                 type="number"
                 inputMode="decimal"
                 step="any"
@@ -173,6 +177,8 @@ export function LinhaServico({
           ) : (
             <div className="relative">
               <input
+                aria-label={`${servico.serviceName} — percentual`}
+                aria-invalid={!validacao.valid}
                 type="number"
                 inputMode="decimal"
                 step="any"

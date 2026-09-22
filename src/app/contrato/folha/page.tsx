@@ -1,3 +1,4 @@
+import { Marca } from '@/components/Marca'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { carregarContexto } from '@/app/contexto'
@@ -44,7 +45,8 @@ export default async function FolhaContratoPage() {
         <BotaoImprimir />
       </div>
 
-      <article className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200 print:rounded-none print:p-0 print:shadow-none print:ring-0">
+      <article className="document-sheet rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200 print:rounded-none print:p-0 print:shadow-none print:ring-0">
+        <div className="document-masthead"><Marca /><span>DOCUMENTO DA OBRA</span></div>
         <header className="border-b-2 border-slate-900 pb-4">
           <h1 className="text-xl font-bold tracking-tight text-slate-900">
             Relação de Serviços do Contrato

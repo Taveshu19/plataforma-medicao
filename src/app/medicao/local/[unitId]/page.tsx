@@ -33,7 +33,7 @@ export default async function LocalMedicaoPage({ params }: PageProps) {
   const anexos = await listarAnexos(rascunho.id)
 
   return (
-    <main className="mx-auto w-full max-w-md px-5 pb-28 pt-6">
+    <main className="mx-auto w-full max-w-md px-5 pb-44 pt-6">
       <FormLocal
         measurementId={rascunho.id}
         unitId={unitId}

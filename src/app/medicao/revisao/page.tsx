@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { StepHeader } from '@/components/ui'
 import { redirect } from 'next/navigation'
 import { carregarContexto, competenciaPorExtenso, formatarReais } from '@/app/contexto'
 import { obterOuCriarRascunho, obterRevisaoMedicao, ItemRevisao } from '@/lib/medicao/dados'
@@ -143,6 +144,7 @@ export default async function RevisaoMedicaoPage() {
 
   return (
     <main className="mx-auto w-full max-w-md px-5 pb-28 pt-6">
+      <StepHeader current={3} />
       <header className="mb-6">
         <Link
           href="/medicao"

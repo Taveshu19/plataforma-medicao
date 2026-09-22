@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Button } from '@/components/ui'
 import Link from 'next/link'
 import { enviarMedicao } from '@/app/medicao/acoes'
 
@@ -84,16 +85,16 @@ export function ConfirmacaoEnvio({
       )}
 
       {/* Barra de ação inferior fixa */}
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 bg-white/95 p-4 backdrop-blur-sm">
+      <div className="action-dock fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 bg-white/95 p-4 backdrop-blur-sm">
         <div className="mx-auto max-w-md">
-          <button
+          <Button
             type="button"
             onClick={() => setModalAberto(true)}
             className="w-full rounded-xl bg-slate-900 px-4 py-3.5 text-sm font-semibold text-white shadow transition hover:bg-slate-800"
           >
             Enviar medição para aprovação ({totalItens}{' '}
             {totalItens === 1 ? 'item' : 'itens'})
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -113,22 +114,23 @@ export function ConfirmacaoEnvio({
             </p>
 
             <div className="mt-6 flex flex-col gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={handleConfirmarEnvio}
                 disabled={enviando}
                 className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
               >
                 {enviando ? 'Enviando medição...' : 'Sim, confirmar e enviar'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={() => setModalAberto(false)}
                 disabled={enviando}
                 className="w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50 disabled:opacity-50"
               >
                 Revisar mais um pouco
-              </button>
+              </Button>
             </div>
           </div>
         </div>

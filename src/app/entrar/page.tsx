@@ -1,6 +1,9 @@
 'use client'
 
 import { useActionState } from 'react'
+import { Marca } from '@/components/Marca'
+import { Button } from '@/components/ui'
+import { ShieldCheck, ArrowRight } from 'lucide-react'
 import { entrar, type EstadoLogin } from './acoes'
 
 const ESTADO_INICIAL: EstadoLogin = {}
@@ -9,9 +12,21 @@ export default function Entrar() {
   const [estado, acao, pendente] = useActionState(entrar, ESTADO_INICIAL)
 
   return (
-    <main className="flex min-h-dvh flex-col justify-center px-6 py-12">
-      <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-3xl font-bold tracking-tight">Medição</h1>
+    <main className="login-page">
+      <aside className="login-story">
+        <Marca clara />
+        <div className="blueprint" aria-hidden="true" />
+        <div>
+          <p className="mb-5 text-xs uppercase tracking-[.2em]">Da obra ao pagamento</p>
+          <h2>Seu trabalho<br />ganha forma.<br /><em>E reconhecimento.</em></h2>
+          <p className="mt-7">Cada serviço executado, cada etapa aprovada. Sua obra avança e você acompanha.</p>
+        </div>
+        <div className="login-story-footer"><ShieldCheck size={20} aria-hidden="true" /> Mais clareza em cada medição.<ArrowRight size={18} className="ml-auto" aria-hidden="true" /></div>
+      </aside>
+      <div className="login-form-panel"><div className="login-form-inner">
+        <div className="login-mobile-brand"><Marca /></div>
+        <p className="section-eyebrow mb-4">Bem-vindo à sua obra</p>
+        <h1>Medição Fácil</h1>
         <p className="mt-2 text-slate-600">Entre para ver seu contrato e enviar sua medição.</p>
 
         <form action={acao} className="mt-10 space-y-5">
@@ -49,15 +64,16 @@ export default function Entrar() {
             </p>
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={pendente}
             className="w-full rounded-xl bg-slate-900 px-4 py-4 text-base font-semibold text-white disabled:opacity-60"
           >
             {pendente ? 'Entrando…' : 'Entrar'}
-          </button>
+          </Button>
         </form>
-      </div>
+        <p className="login-footer">Seu acesso é fornecido pela construtora.<br />Se precisar de ajuda, fale com a equipe da sua obra.</p>
+      </div></div>
     </main>
   )
 }

@@ -301,7 +301,7 @@ export function TabelaAjustes({
       </section>
 
       {/* Ações de aprovação, devolução e salvamento */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 p-4 backdrop-blur-sm">
+      <div className="action-dock fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 p-4 backdrop-blur-sm">
         <div className="mx-auto flex max-w-2xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
           <button
             type="button"

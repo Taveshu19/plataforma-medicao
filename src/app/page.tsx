@@ -1,4 +1,7 @@
 import Link from 'next/link'
+import { Marca } from '@/components/Marca'
+import { ActionLink } from '@/components/ui'
+import { Ruler, History, FileText } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { carregarContexto } from './contexto'
 import { competenciaPorExtenso } from './formato'
@@ -21,8 +24,10 @@ export default async function Home() {
   const avisosNaoLidos = await contarNaoLidos()
 
   return (
-    <main className="mx-auto w-full max-w-md px-5 pb-16 pt-8">
-      <header className="flex items-start justify-between gap-4">
+    <>
+    <div className="product-bar"><div className="product-bar-inner"><Marca /><span className="product-bar-caption">Portal do empreiteiro</span></div></div>
+    <main className="home-workspace mx-auto w-full px-5 pb-16 pt-8">
+      <header className="home-greeting flex items-start justify-between gap-4">
         <div>
           <p className="text-sm text-slate-600">Olá,</p>
           <h1 className="text-2xl font-bold tracking-tight">{nome}</h1>
@@ -49,7 +54,8 @@ export default async function Home() {
         </div>
       </header>
 
-      <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <div className="home-grid"><div>
+      <section className="contract-hero">
         <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Obra</p>
         <p className="mt-1 text-lg font-semibold">{obra}</p>
         <p className="mt-3 text-sm text-slate-600">
@@ -65,8 +71,10 @@ export default async function Home() {
         </div>
       </section>
 
-      <TrilhaStatus passos={trilha} protocolo={protocoloAtual} />
 
+
+      </div><div className="home-side">
+      <p className="section-eyebrow mt-6 md:mt-0">Próximo passo</p>
       {periodo ? (
         <section className="mt-5 rounded-2xl bg-emerald-50 p-5 ring-1 ring-emerald-200">
           <p className="text-sm font-semibold text-emerald-900">
@@ -90,36 +98,13 @@ export default async function Home() {
         </section>
       )}
 
-      <nav className="mt-8 space-y-3">
-        {periodo ? (
-          <Link
-            href="/medicao"
-            className="flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-5 text-base font-semibold text-white hover:bg-slate-800"
-          >
-            Fazer minha medição
-          </Link>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="w-full rounded-xl bg-slate-900 px-4 py-5 text-base font-semibold text-white disabled:opacity-40"
-          >
-            Fazer minha medição
-          </button>
-        )}
-        <Link
-          href="/medicoes"
-          className="flex w-full items-center justify-center rounded-xl bg-white px-4 py-5 text-base font-semibold text-slate-900 ring-1 ring-slate-300 hover:bg-slate-50"
-        >
-          Medições anteriores
-        </Link>
-        <Link
-          href="/contrato"
-          className="flex w-full items-center justify-center rounded-xl bg-white px-4 py-5 text-base font-semibold text-slate-900 ring-1 ring-slate-300 hover:bg-slate-50"
-        >
-          Meu contrato
-        </Link>
+      <nav className="mt-8 space-y-3" aria-label="Ações da obra">
+        {periodo ? <ActionLink href="/medicao" icon={Ruler} primary>Fazer minha medição</ActionLink> : <button disabled className="ui-button ui-button-primary w-full">Fazer minha medição</button>}
+        <ActionLink href="/medicoes" icon={History}>Medições anteriores</ActionLink>
+        <ActionLink href="/contrato" icon={FileText}>Meu contrato</ActionLink>
       </nav>
-    </main>
+      <TrilhaStatus passos={trilha} protocolo={protocoloAtual} />
+      </div></div>
+    </main></>
   )
 }

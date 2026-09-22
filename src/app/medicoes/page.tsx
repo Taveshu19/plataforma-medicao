@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Badge } from '@/components/ui'
 import { redirect } from 'next/navigation'
 import { carregarContexto, competenciaPorExtenso, formatarReais } from '@/app/contexto'
 import { listarHistoricoMedicoes } from '@/lib/medicao/dados'
@@ -82,11 +83,7 @@ export default async function HistoricoMedicoesPage() {
                     </p>
                   </div>
 
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${st.cor}`}
-                  >
-                    {st.rotulo}
-                  </span>
+                  <Badge className={st.cor}>{st.rotulo}</Badge>
                 </div>
 
                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs">

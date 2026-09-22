@@ -18,6 +18,7 @@ test.describe('fluxo de contrato, espelho e auditoria', () => {
     // Confere seções do contrato
     await expect(page.getByRole('heading', { name: 'Meu Contrato' })).toBeVisible()
     await expect(page.getByText('Extrato Geral do Contrato')).toBeVisible()
+    await page.getByTestId('botao-detalhe-por-local').click()
     await expect(page.getByPlaceholder('Filtrar por serviço, local ou etapa...')).toBeVisible()
 
     // 3. Acessa "Medições anteriores"

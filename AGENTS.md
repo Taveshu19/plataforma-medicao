@@ -9,3 +9,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Estado visual
+
+Identidade e principais fluxos redesenhados localmente em 21/09/2026. Ver [entrega visual, evidências e limites](docs/visual/2026-09-21-entrega-visual.md).

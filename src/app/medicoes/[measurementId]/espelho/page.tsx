@@ -1,3 +1,4 @@
+import { Marca } from '@/components/Marca'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { obterEspelhoMedicao } from '@/lib/espelho/dados'
@@ -43,7 +44,7 @@ export default async function EspelhoMedicaoPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 print:bg-white print:py-0">
-      <main className="mx-auto max-w-4xl bg-white p-8 shadow-sm ring-1 ring-slate-200 print:max-w-none print:shadow-none print:ring-0 print:p-0">
+      <main className="document-sheet mx-auto max-w-4xl bg-white p-8 shadow-sm ring-1 ring-slate-200 print:max-w-none print:shadow-none print:ring-0 print:p-0">
         {/* Barra superior de ações (oculta na impressão) */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4 print:hidden">
           <Link
@@ -60,6 +61,7 @@ export default async function EspelhoMedicaoPage({ params }: PageProps) {
         </div>
 
         {/* Cabeçalho do Documento Oficial */}
+        <div className="document-masthead"><Marca /><span>DOCUMENTO DA OBRA</span></div>
         <header className="border-b-2 border-slate-900 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
