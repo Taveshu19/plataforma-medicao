@@ -18,7 +18,8 @@ views:
   - type: table
     name: Em aberto
     filters:
-      - status != "feito"
+      and:
+        - status != "feito"
     order:
       - file.name
       - tipo
@@ -59,7 +60,8 @@ views:
   - type: cards
     name: Por tipo
     filters:
-      - status != "feito"
+      and:
+        - status != "feito"
     groupBy:
       property: tipo
       direction: ASC
