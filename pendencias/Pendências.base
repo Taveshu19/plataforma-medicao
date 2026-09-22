@@ -1,0 +1,70 @@
+filters:
+  and:
+    - file.inFolder("Empreeteira_Pedro/pendencias")
+    - file.ext == "md"
+
+views:
+  - type: table
+    name: Tudo
+    order:
+      - file.name
+      - status
+      - tipo
+      - quem
+      - prioridade
+      - linear
+      - atualizado
+
+  - type: table
+    name: Em aberto
+    filters:
+      - status != "feito"
+    order:
+      - file.name
+      - tipo
+      - quem
+      - prioridade
+      - linear
+    sort:
+      - property: prioridade
+        direction: ASC
+
+  - type: table
+    name: Só depende de mim
+    filters:
+      and:
+        - status != "feito"
+        - quem == "Gustavo"
+    order:
+      - file.name
+      - tipo
+      - prioridade
+      - linear
+    sort:
+      - property: prioridade
+        direction: ASC
+
+  - type: table
+    name: Esperando gente
+    filters:
+      and:
+        - status != "feito"
+        - tipo == "aguardando"
+    order:
+      - file.name
+      - quem
+      - atualizado
+      - linear
+
+  - type: cards
+    name: Por tipo
+    filters:
+      - status != "feito"
+    groupBy:
+      property: tipo
+      direction: ASC
+    order:
+      - file.name
+      - quem
+      - prioridade
+      - linear
