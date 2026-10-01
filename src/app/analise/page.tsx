@@ -4,6 +4,7 @@ import { contarNaoLidos } from '@/lib/notificacoes/dados'
 import { redirect } from 'next/navigation'
 import { obterPerfilUsuario, listarMedicoesPorStatus } from '@/lib/aprovacao/dados'
 import { TabelaMedicoes } from './components/TabelaMedicoes'
+import { listarFaturamentosDiretos } from '@/lib/faturamento-direto/dados'
 
 export default async function PainelAnalisePage() {
   const perfil = await obterPerfilUsuario()
@@ -15,6 +16,7 @@ export default async function PainelAnalisePage() {
   }
 
   const medicoes = await listarMedicoesPorStatus()
+  const fdPendentes = (await listarFaturamentosDiretos(['AGUARDANDO_ENGENHARIA'])).length
 
   return (
     <>
@@ -28,6 +30,10 @@ export default async function PainelAnalisePage() {
             </span>
             <nav className="flex items-center gap-2 text-xs font-semibold">
               <span className="text-slate-900 border-b-2 border-slate-900 pb-0.5">Aprovações</span>
+              <span className="text-slate-300">•</span>
+              <Link href="/analise/faturamento-direto" className="text-slate-500 hover:text-slate-900">
+                Faturamento Direto{fdPendentes > 0 ? ` (${fdPendentes})` : ''}
+              </Link>
               <span className="text-slate-300">•</span>
               <a href="/faturamento" className="text-slate-500 hover:text-slate-900">Faturamento e NFs</a>
             </nav>

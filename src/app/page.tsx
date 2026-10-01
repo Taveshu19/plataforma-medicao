@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { Marca } from '@/components/Marca'
 import { ActionLink } from '@/components/ui'
-import { Ruler, History, FileText } from 'lucide-react'
+import { Ruler, History, FileText, Receipt, FileUp } from 'lucide-react'
+import { createServerSupabase } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { carregarContexto } from './contexto'
 import { competenciaPorExtenso } from './formato'
@@ -22,6 +23,15 @@ export default async function Home() {
   const { nome, obra, contratoNumero, descricao, resumo, periodo, trilha, protocoloAtual } =
     contexto
   const avisosNaoLidos = await contarNaoLidos()
+
+  // Medições com aprovação final da cadeia: faturamento liberado, falta a NF.
+  const supabase = await createServerSupabase()
+  const { data: liberadas } = await supabase
+    .from('measurements')
+    .select('id, protocol')
+    .eq('contract_id', contexto.contratoId)
+    .eq('status', 'APROVADA')
+    .order('submitted_at', { ascending: true })
 
   return (
     <>
@@ -75,6 +85,22 @@ export default async function Home() {
 
       </div><div className="home-side">
       <p className="section-eyebrow mt-6 md:mt-0">Próximo passo</p>
+      {(liberadas ?? []).map((m) => (
+        <section key={m.id} className="mt-5 rounded-2xl bg-emerald-50 p-5 ring-1 ring-emerald-300">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
+            Medição aprovada – faturamento liberado
+          </p>
+          <p className="mt-1 text-sm text-emerald-900">
+            A medição <strong className="font-mono">{m.protocol}</strong> foi aprovada pela Gerência. Envie a Nota Fiscal.
+          </p>
+          <Link
+            href={`/medicoes/${m.id}/nf`}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
+          >
+            <FileUp size={18} aria-hidden="true" /> Enviar Nota Fiscal
+          </Link>
+        </section>
+      ))}
       {periodo ? (
         <section className="mt-5 rounded-2xl bg-emerald-50 p-5 ring-1 ring-emerald-200">
           <p className="text-sm font-semibold text-emerald-900">
@@ -101,6 +127,7 @@ export default async function Home() {
       <nav className="mt-8 space-y-3" aria-label="Ações da obra">
         {periodo ? <ActionLink href="/medicao" icon={Ruler} primary>Fazer minha medição</ActionLink> : <button disabled className="ui-button ui-button-primary w-full">Fazer minha medição</button>}
         <ActionLink href="/medicoes" icon={History}>Medições anteriores</ActionLink>
+        <ActionLink href="/faturamento-direto" icon={Receipt}>Faturamento Direto</ActionLink>
         <ActionLink href="/contrato" icon={FileText}>Meu contrato</ActionLink>
       </nav>
       <TrilhaStatus passos={trilha} protocolo={protocoloAtual} />

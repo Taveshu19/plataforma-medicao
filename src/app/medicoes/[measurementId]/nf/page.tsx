@@ -73,8 +73,11 @@ export default async function PaginaEnvioNF({ params }: PaginaEnvioNFProps) {
           Voltar para Minhas Medições
         </Link>
         <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">
-          Emitir Nota Fiscal
+          Enviar Nota Fiscal
         </h1>
+        <p className="mt-2 inline-flex rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800 ring-1 ring-emerald-200">
+          Medição aprovada – faturamento liberado
+        </p>
         <p className="mt-1 text-xs text-slate-500">
           {dados.projectName} • {competenciaPorExtenso(dados.competence)}
         </p>

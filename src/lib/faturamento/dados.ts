@@ -39,6 +39,7 @@ export interface NotaPendente {
   invoiceStatus: string
   pdfPath: string | null
   xmlPath: string | null
+  notes: string | null
   submittedAt: string
 }
 
@@ -114,6 +115,7 @@ export async function listarNotasPendentes(): Promise<NotaPendente[]> {
     invoiceStatus: r.invoice_status,
     pdfPath: r.pdf_path,
     xmlPath: r.xml_path,
+    notes: r.notes ?? null,
     submittedAt: r.submitted_at,
   }))
 }

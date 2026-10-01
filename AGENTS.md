@@ -13,3 +13,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Estado visual
 
 Identidade e principais fluxos redesenhados localmente em 21/09/2026. Ver [entrega visual, evidências e limites](docs/visual/2026-09-21-entrega-visual.md).
+
+## Faturamento
+
+NF da medição só após aprovação final; Faturamento Direto (Empreiteiro → Engenharia → Administrativo) desde 01/10/2026. Ver [registro](docs/2026-10-01-faturamento-direto.md).

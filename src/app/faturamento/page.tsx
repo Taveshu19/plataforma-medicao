@@ -5,6 +5,8 @@ import { createServerSupabase } from '@/lib/supabase/server'
 import { obterPerfilUsuario } from '@/lib/aprovacao/dados'
 import { listarNotasPendentes } from '@/lib/faturamento/dados'
 import { TabelaFaturamento } from './components/TabelaFaturamento'
+import { TabelaFaturamentoDireto } from './components/TabelaFaturamentoDireto'
+import { listarFaturamentosDiretos } from '@/lib/faturamento-direto/dados'
 
 export default async function PainelFaturamentoPage() {
   const supabase = await createServerSupabase()
@@ -24,6 +26,7 @@ export default async function PainelFaturamentoPage() {
   }
 
   const notas = await listarNotasPendentes()
+  const diretos = await listarFaturamentosDiretos(['APROVADO', 'PAGO'])
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -42,6 +45,12 @@ export default async function PainelFaturamentoPage() {
                 className="rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               >
                 Aprovações da Engenharia
+              </Link>
+              <Link
+                href="/analise/faturamento-direto"
+                className="rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              >
+                Faturamento Direto
               </Link>
               <Link
                 href="/faturamento"
@@ -83,7 +92,21 @@ export default async function PainelFaturamentoPage() {
           </p>
         </div>
 
-        <TabelaFaturamento notas={notas} />
+        <section>
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900">
+            NFs de medição
+            <span className="text-xs font-medium text-slate-500">— liberadas após aprovação final da Gerência</span>
+          </h2>
+          <TabelaFaturamento notas={notas} />
+        </section>
+
+        <section className="mt-12">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900">
+            Faturamento Direto
+            <span className="text-xs font-medium text-slate-500">— NFs de material/outros aprovadas só pela Engenharia</span>
+          </h2>
+          <TabelaFaturamentoDireto itens={diretos} />
+        </section>
       </main>
     </div>
   )

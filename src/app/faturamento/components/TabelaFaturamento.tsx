@@ -9,6 +9,7 @@ import {
   marcarComoPagaAction,
 } from '@/app/faturamento/acoes'
 import { ModalRejeicaoNF } from './ModalRejeicaoNF'
+import { LinksArquivosNF, SeloOrigem } from '@/components/FaturamentoDireto'
 
 interface TabelaFaturamentoProps {
   notas: NotaPendente[]
@@ -194,7 +195,8 @@ export function TabelaFaturamento({ notas }: TabelaFaturamentoProps) {
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="font-mono text-sm font-extrabold text-slate-900">
+                      <SeloOrigem origem="MEDICAO" />
+                      <span className="mt-2 block font-mono text-sm font-extrabold text-slate-900">
                         NF nº {item.invoiceNumber}
                       </span>
                       <p className="mt-0.5 text-xs text-slate-500">
@@ -242,6 +244,11 @@ export function TabelaFaturamento({ notas }: TabelaFaturamentoProps) {
                       </div>
                     )}
                   </div>
+                </div>
+
+                <div className="mt-3 space-y-2">
+                  {item.notes && <p className="text-[11px] text-slate-500">Obs.: {item.notes}</p>}
+                  <LinksArquivosNF pdfPath={item.pdfPath} xmlPath={item.xmlPath} />
                 </div>
 
                 {/* Botões de Ação */}

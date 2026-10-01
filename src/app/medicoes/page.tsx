@@ -13,7 +13,7 @@ function formatarStatus(status: string) {
     case 'DEVOLVIDA':
       return { rotulo: 'Devolvida', cor: 'bg-rose-50 text-rose-800 ring-rose-200' }
     case 'APROVADA':
-      return { rotulo: 'Aprovada', cor: 'bg-emerald-50 text-emerald-800 ring-emerald-200' }
+      return { rotulo: 'Medição aprovada – faturamento liberado', cor: 'bg-emerald-50 text-emerald-800 ring-emerald-200' }
     case 'NF_ENVIADA':
       return { rotulo: 'NF Enviada', cor: 'bg-indigo-50 text-indigo-800 ring-indigo-200' }
     case 'NF_APROVADA':
@@ -127,7 +127,7 @@ export default async function HistoricoMedicoesPage() {
                       href={`/medicoes/${med.id}/nf`}
                       className="flex w-full items-center justify-center rounded-xl bg-emerald-600 px-3 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700"
                     >
-                      Emitir / Anexar Nota Fiscal
+                      Enviar Nota Fiscal
                     </Link>
                   </div>
                 )}

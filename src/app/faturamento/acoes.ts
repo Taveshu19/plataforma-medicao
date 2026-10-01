@@ -10,6 +10,7 @@ export interface EnviarNotaInput {
   amount: number
   pdfPath?: string | null
   xmlPath?: string | null
+  notes?: string | null
 }
 
 export interface FaturamentoResultado {
@@ -48,7 +49,7 @@ export async function uploadNotaFiscalPdfAction(
   const { error: uploadError } = await supabase.storage
     .from('notas-fiscais')
     .upload(caminhoArquivo, buffer, {
-      contentType: file.type || 'application/pdf',
+      contentType: file.type || (file.name.toLowerCase().endsWith('.xml') ? 'application/xml' : 'application/pdf'),
       upsert: true,
     })
 
@@ -95,6 +96,7 @@ export async function enviarNotaFiscalAction(
     p_amount: input.amount,
     p_pdf: input.pdfPath ?? undefined,
     p_xml: input.xmlPath ?? undefined,
+    p_notes: input.notes ?? undefined,
   })
 
   if (error) {

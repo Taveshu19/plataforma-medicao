@@ -49,7 +49,7 @@ export function montarTrilha(
     return [
       { rotulo: 'Criar medição', estado: 'atual' },
       ...ordenados.map((n) => ({ rotulo: n.label, estado: 'pendente' as const })),
-      { rotulo: 'Liberado para NF', estado: 'pendente' },
+      { rotulo: 'Faturamento liberado', estado: 'pendente' },
       { rotulo: 'Nota fiscal', estado: 'pendente' },
       { rotulo: 'Pagamento', estado: 'pendente' },
     ]
@@ -83,7 +83,7 @@ export function montarTrilha(
   })
 
   const liberado: PassoTrilha = {
-    rotulo: 'Liberado para NF',
+    rotulo: 'Faturamento liberado',
     estado:
       status === 'APROVADA'
         ? 'atual'

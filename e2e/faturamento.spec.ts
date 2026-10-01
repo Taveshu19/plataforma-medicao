@@ -81,17 +81,22 @@ test.describe('ciclo fiscal e financeiro (emissao de NF, aprovacao e pagamento)'
     await expect(page.getByText(protocolo)).toBeVisible()
 
     const cardMedicao = page.locator('article', { hasText: protocolo })
-    await expect(cardMedicao.getByText('Aprovada', { exact: true })).toBeVisible()
+    await expect(cardMedicao.getByText('Medição aprovada – faturamento liberado', { exact: true })).toBeVisible()
 
-    const botaoEmitirNF = cardMedicao.getByRole('link', { name: 'Emitir / Anexar Nota Fiscal' })
+    const botaoEmitirNF = cardMedicao.getByRole('link', { name: 'Enviar Nota Fiscal' })
     await expect(botaoEmitirNF).toBeVisible()
     await botaoEmitirNF.click()
 
     await expect(page).toHaveURL(/\/medicoes\/.+\/nf$/)
-    await expect(page.getByRole('heading', { name: 'Emitir Nota Fiscal' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Enviar Nota Fiscal' })).toBeVisible()
 
     // Preenche formulário da NF
     await page.getByLabel('Número da Nota Fiscal *').fill('NF-8820')
+    await page.getByLabel('Anexo do PDF da Nota Fiscal').setInputFiles({
+      name: 'nf-8820.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('%PDF-1.4 teste'),
+    })
     await page.getByRole('button', { name: 'Enviar Nota Fiscal' }).click()
 
     await expect(page.getByRole('heading', { name: 'Nota Fiscal enviada com sucesso!' })).toBeVisible()

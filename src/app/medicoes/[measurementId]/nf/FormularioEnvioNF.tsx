@@ -27,6 +27,8 @@ export function FormularioEnvioNF({
   )
   const [valor, setValor] = useState(valorAprovado.toString())
   const [arquivo, setArquivo] = useState<File | null>(null)
+  const [arquivoXml, setArquivoXml] = useState<File | null>(null)
+  const [observacao, setObservacao] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
   const [sucesso, setSucesso] = useState(false)
@@ -54,6 +56,11 @@ export function FormularioEnvioNF({
       return
     }
 
+    if (!arquivo && !arquivoXml) {
+      setErro('Anexe a Nota Fiscal (PDF e/ou XML).')
+      return
+    }
+
     if (foraDaTolerancia) {
       setErro(
         `O valor informado diverge do aprovado além da tolerância permitida de R$ ${tolerancia.toFixed(2)}.`,
@@ -64,19 +71,16 @@ export function FormularioEnvioNF({
     setEnviando(true)
 
     try {
-      let pdfPath: string | null = null
-
-      if (arquivo) {
+      const subir = async (f: File | null) => {
+        if (!f) return null
         const formData = new FormData()
-        formData.append('file', arquivo)
+        formData.append('file', f)
         const uploadRes = await uploadNotaFiscalPdfAction(companyId, measurementId, formData)
-
-        if (uploadRes.error) {
-          console.error('Erro no upload do PDF:', uploadRes.error)
-        } else if (uploadRes.path) {
-          pdfPath = uploadRes.path
-        }
+        if (uploadRes.error) throw new Error(`Falha ao enviar o arquivo ${f.name}: ${uploadRes.error}`)
+        return uploadRes.path ?? null
       }
+      const pdfPath = await subir(arquivo)
+      const xmlPath = await subir(arquivoXml)
 
       const res = await enviarNotaFiscalAction({
         measurementId,
@@ -84,6 +88,8 @@ export function FormularioEnvioNF({
         issuedOn: dataEmissao,
         amount: numValor,
         pdfPath,
+        xmlPath,
+        notes: observacao.trim() || null,
       })
 
       if (!res.success) {
@@ -114,7 +120,7 @@ export function FormularioEnvioNF({
         </h2>
 
         <p className="mt-2 text-sm text-slate-600">
-          Sua nota fiscal nº <strong className="text-slate-900">{numero}</strong> foi anexada à medição e enviada para conferência da equipe financeira.
+          Sua nota fiscal nº <strong className="text-slate-900">{numero}</strong> foi vinculada à medição e enviada ao Administrativo/Faturamento.
         </p>
 
         <Link
@@ -226,6 +232,33 @@ export function FormularioEnvioNF({
               Arquivo selecionado: {arquivo.name} ({(arquivo.size / 1024).toFixed(1)} KB)
             </p>
           )}
+        </div>
+
+        <div>
+          <label htmlFor="nf-xml" className="block text-xs font-semibold text-slate-700">
+            Anexo do XML da Nota Fiscal
+          </label>
+          <input
+            id="nf-xml"
+            type="file"
+            accept=".xml,text/xml,application/xml"
+            onChange={(e) => setArquivoXml(e.target.files?.[0] ?? null)}
+            className="mt-1.5 w-full text-xs text-slate-500 file:mr-3 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-2.5 file:text-xs file:font-semibold file:text-slate-700 hover:file:bg-slate-200"
+          />
+          <p className="mt-1 text-[11px] text-slate-500">De preferência envie o PDF e o XML.</p>
+        </div>
+
+        <div>
+          <label htmlFor="nf-obs" className="block text-xs font-semibold text-slate-700">
+            Observação (opcional)
+          </label>
+          <textarea
+            id="nf-obs"
+            rows={2}
+            value={observacao}
+            onChange={(e) => setObservacao(e.target.value)}
+            className="mt-1.5 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+          />
         </div>
       </div>
 

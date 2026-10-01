@@ -1022,7 +1022,13 @@ export type Database = {
         Args: { p_item_id: string; p_qty_approved: number }
         Returns: undefined
       }
+      approve_direct_billing: { Args: { p_id: string }; Returns: undefined }
       approve_invoice: { Args: { p_invoice_id: string }; Returns: undefined }
+      pay_direct_billing: { Args: { p_id: string }; Returns: undefined }
+      return_direct_billing: {
+        Args: { p_id: string; p_reason: string }
+        Returns: undefined
+      }
       approve_measurement: {
         Args: { p_measurement_id: string }
         Returns: Database["public"]["Enums"]["measurement_status"]
@@ -1230,6 +1236,33 @@ export type Database = {
           protocol: string
           submitted_at: string
           xml_path: string
+          notes: string | null
+        }[]
+      }
+      get_direct_billing: { Args: { p_id: string }; Returns: Json }
+      list_direct_billings: {
+        Args: {
+          p_statuses?: Database["public"]["Enums"]["direct_billing_status"][]
+        }
+        Returns: {
+          amount: number
+          approved_at: string | null
+          billing_type: string
+          contract_number: string
+          contractor_name: string
+          description: string
+          id: string
+          issued_on: string
+          notes: string | null
+          number: string
+          paid_at: string | null
+          pdf_path: string | null
+          project_name: string
+          protocol: string
+          return_reason: string | null
+          status: Database["public"]["Enums"]["direct_billing_status"]
+          submitted_at: string | null
+          xml_path: string | null
         }[]
       }
       get_pending_measurements: {
@@ -1353,8 +1386,24 @@ export type Database = {
           p_issued_on: string
           p_measurement_id: string
           p_number: string
+          p_notes?: string
           p_pdf?: string
           p_xml?: string
+        }
+        Returns: string
+      }
+      submit_direct_billing: {
+        Args: {
+          p_amount: number
+          p_contract_id: string
+          p_description: string
+          p_id: string | null
+          p_issued_on: string
+          p_notes?: string | null
+          p_number: string
+          p_pdf?: string | null
+          p_type: string
+          p_xml?: string | null
         }
         Returns: string
       }
@@ -1375,6 +1424,13 @@ export type Database = {
       }
     }
     Enums: {
+      direct_billing_status:
+        | "RASCUNHO"
+        | "ENVIADO"
+        | "AGUARDANDO_ENGENHARIA"
+        | "DEVOLVIDO"
+        | "APROVADO"
+        | "PAGO"
       app_role:
         | "admin"
         | "engenharia"
@@ -1541,6 +1597,14 @@ export const Constants = {
   },
   public: {
     Enums: {
+      direct_billing_status: [
+        "RASCUNHO",
+        "ENVIADO",
+        "AGUARDANDO_ENGENHARIA",
+        "DEVOLVIDO",
+        "APROVADO",
+        "PAGO",
+      ],
       app_role: [
         "admin",
         "engenharia",
