@@ -3,7 +3,7 @@ tipo: construir
 status: feito
 quem: Gustavo
 prioridade: 2
-linear:
+linear: GUS-77
 origem: pedido do Gustavo — alterações interface empreiteiro
 atualizado: 2026-10-01
 ---
