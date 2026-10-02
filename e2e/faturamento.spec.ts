@@ -62,7 +62,7 @@ test.describe('ciclo fiscal e financeiro (emissao de NF, aprovacao e pagamento)'
     for (const nivel of [2, 3]) {
       const card = page.getByTestId(`card-medicao-${protocolo}`)
       await expect(card).toBeVisible()
-      await expect(card.getByText(`Nível ${nivel} • Em análise`)).toBeVisible()
+      await expect(card.getByText(`Nível ${nivel} • Aguardando aprovação`)).toBeVisible()
       await card.getByRole('link', { name: 'Analisar medição' }).click()
       await page.getByRole('button', { name: 'Aprovar medição' }).click()
       await expect(page).toHaveURL('/analise')

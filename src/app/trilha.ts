@@ -82,24 +82,27 @@ export function montarTrilha(
     return { rotulo: n.label, estado: 'pendente' }
   })
 
+  // Aprovada pela cadeia toda = faturamento já liberado (bolinha verde).
+  // A partir daí a etapa atual é a nota fiscal do empreiteiro.
   const liberado: PassoTrilha = {
     rotulo: 'Faturamento liberado',
-    estado:
-      status === 'APROVADA'
-        ? 'atual'
-        : ['NF_ENVIADA', 'NF_APROVADA', 'PAGA'].includes(status)
-        ? 'concluido'
-        : 'pendente',
+    estado: passouAprovacao ? 'concluido' : 'pendente',
   }
 
   const notaFiscal: PassoTrilha = {
     rotulo: 'Nota fiscal',
     estado:
-      status === 'NF_ENVIADA'
+      status === 'APROVADA' || status === 'NF_ENVIADA'
         ? 'atual'
         : ['NF_APROVADA', 'PAGA'].includes(status)
         ? 'concluido'
         : 'pendente',
+    detalhe:
+      status === 'APROVADA'
+        ? 'Envie a nota fiscal desta medição.'
+        : status === 'NF_ENVIADA'
+        ? 'Enviada • em conferência no Administrativo.'
+        : undefined,
   }
 
   const pagamento: PassoTrilha = {

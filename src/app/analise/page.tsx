@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Marca } from '@/components/Marca'
 import { contarNaoLidos } from '@/lib/notificacoes/dados'
 import { redirect } from 'next/navigation'
-import { obterPerfilUsuario, listarMedicoesPorStatus } from '@/lib/aprovacao/dados'
+import { obterPerfilUsuario, listarMedicoesPorStatus, listarSituacaoEnvioMedicao, veFaturamentoComum } from '@/lib/aprovacao/dados'
 import { TabelaMedicoes } from './components/TabelaMedicoes'
 import { listarFaturamentosDiretos } from '@/lib/faturamento-direto/dados'
 
@@ -17,6 +17,7 @@ export default async function PainelAnalisePage() {
 
   const medicoes = await listarMedicoesPorStatus()
   const fdPendentes = (await listarFaturamentosDiretos(['AGUARDANDO_ENGENHARIA'])).length
+  const envios = await listarSituacaoEnvioMedicao()
 
   return (
     <>
@@ -34,8 +35,12 @@ export default async function PainelAnalisePage() {
               <Link href="/analise/faturamento-direto" className="text-slate-500 hover:text-slate-900">
                 Faturamento Direto{fdPendentes > 0 ? ` (${fdPendentes})` : ''}
               </Link>
-              <span className="text-slate-300">•</span>
-              <a href="/faturamento" className="text-slate-500 hover:text-slate-900">Faturamento e NFs</a>
+              {veFaturamentoComum(perfil.role) && (
+                <>
+                  <span className="text-slate-300">•</span>
+                  <Link href="/faturamento" className="text-slate-500 hover:text-slate-900">Faturamento e NFs</Link>
+                </>
+              )}
             </nav>
           </div>
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
@@ -78,7 +83,7 @@ export default async function PainelAnalisePage() {
       </header>
 
       <section className="mt-6">
-        <TabelaMedicoes medicoes={medicoes} />
+        <TabelaMedicoes medicoes={medicoes} envios={envios} />
       </section>
     </main></>
   )

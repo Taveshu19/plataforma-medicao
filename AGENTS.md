@@ -17,3 +17,4 @@ Identidade e principais fluxos redesenhados localmente em 21/09/2026. Ver [entre
 ## Faturamento
 
 NF da medição só após aprovação final; Faturamento Direto (Empreiteiro → Engenharia → Administrativo) desde 01/10/2026. Ver [registro](docs/2026-10-01-faturamento-direto.md).
+Painel da engenharia com 5 cards e trilha por medição desde 02/10/2026: [registro](docs/2026-10-02-painel-engenharia.md).

@@ -25,6 +25,8 @@ export interface ContextoEmpreiteiro {
   periodo: Periodo | null
   trilha: PassoTrilha[]
   protocoloAtual: string | null
+  /** Uma trilha por medição ainda em andamento (aprovada sem NF, em análise...). */
+  trilhas: { protocolo: string | null; passos: PassoTrilha[] }[]
   /** Rotulo do local nesta obra: casa, apartamento ou pavimento. */
   rotuloLocal: string
 }
@@ -107,6 +109,37 @@ export async function carregarContexto(): Promise<ContextoEmpreiteiro | null> {
     niveis,
   )
 
+  // Mais de uma medição pode estar em andamento ao mesmo tempo (ex.: agosto
+  // aprovada esperando NF e setembro em análise). Cada uma ganha sua trilha,
+  // para o empreiteiro ver em que fase está cada protocolo.
+  const { data: ativas } = await supabase
+    .from('measurements')
+    .select('status, current_level, protocol, measurement_periods(competence), invoices(expected_payment_date, created_at)')
+    .eq('contract_id', contrato.id)
+    .in('status', ['RASCUNHO', 'EM_ANALISE', 'DEVOLVIDA', 'APROVADA', 'NF_ENVIADA', 'NF_APROVADA'])
+
+  const trilhas = (ativas ?? [])
+    .map((m) => {
+      const periodo = m.measurement_periods as unknown as { competence: string } | null
+      const notas = (m.invoices ?? []) as { expected_payment_date: string | null; created_at: string }[]
+      const ultimaNota = [...notas].sort((a, b) => b.created_at.localeCompare(a.created_at))[0]
+      return {
+        competencia: periodo?.competence ?? '',
+        protocolo: m.protocol ?? null,
+        passos: montarTrilha(
+          {
+            status: m.status,
+            currentLevel: Number(m.current_level ?? 0),
+            protocolo: m.protocol ?? null,
+            dataPrevistaPagamento: ultimaNota?.expected_payment_date ?? null,
+          },
+          niveis,
+        ),
+      }
+    })
+    .sort((a, b) => b.competencia.localeCompare(a.competencia))
+    .map(({ protocolo, passos }) => ({ protocolo, passos }))
+
   return {
     nome: perfil?.full_name ?? user.email ?? 'Empreiteiro',
     obra,
@@ -124,6 +157,7 @@ export async function carregarContexto(): Promise<ContextoEmpreiteiro | null> {
       : null,
     trilha,
     protocoloAtual: progressoLinha?.protocol ?? null,
+    trilhas: trilhas.length > 0 ? trilhas : [{ protocolo: progressoLinha?.protocol ?? null, passos: trilha }],
     rotuloLocal,
   }
 }

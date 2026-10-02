@@ -1,44 +1,42 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { ClipboardCheck, Clock3, Undo2 } from 'lucide-react'
+import { ClipboardCheck, Clock3, FileWarning, Send, Undo2 } from 'lucide-react'
 import { Badge } from '@/components/ui'
 import Link from 'next/link'
-import { MedicaoPendente } from '@/lib/aprovacao/dados'
+import type { EnvioMedicaoContrato, MedicaoPendente } from '@/lib/aprovacao/dados'
 import { formatarReais, competenciaPorExtenso } from '@/app/formato'
+import { ListaPendentesEnvio } from './ListaPendentesEnvio'
 
-type AbaFiltro = 'EM_ANALISE' | 'APROVADAS' | 'DEVOLVIDAS' | 'TODAS'
+type AbaFiltro = 'PENDENTES_ENVIO' | 'EM_ANALISE' | 'DEVOLVIDAS' | 'APROVADAS' | 'PENDENTES_NF' | 'TODAS'
 
 interface TabelaMedicoesProps {
   medicoes: MedicaoPendente[]
+  envios: EnvioMedicaoContrato[]
 }
 
+const APROVADAS = ['APROVADA', 'NF_ENVIADA', 'NF_APROVADA', 'PAGA']
+
+// Na visão da engenharia o pagamento não aparece: depois da aprovação só
+// interessa se o empreiteiro já emitiu a NF.
 function obterBadgeStatus(status: string, level: number) {
   switch (status) {
     case 'EM_ANALISE':
       return {
-        rotulo: `Nível ${level} • Em análise`,
+        rotulo: `Nível ${level} • Aguardando aprovação`,
         estilo: 'bg-amber-50 text-amber-800 ring-amber-200',
       }
     case 'APROVADA':
       return {
-        rotulo: 'Aprovada',
+        rotulo: 'Aprovada • NF pendente',
         estilo: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
       }
     case 'NF_ENVIADA':
-      return {
-        rotulo: 'NF em conferência',
-        estilo: 'bg-indigo-50 text-indigo-800 ring-indigo-200',
-      }
     case 'NF_APROVADA':
-      return {
-        rotulo: 'Pronta p/ pagamento',
-        estilo: 'bg-teal-50 text-teal-800 ring-teal-200',
-      }
     case 'PAGA':
       return {
-        rotulo: 'Paga / Liquidada',
-        estilo: 'bg-blue-50 text-blue-800 ring-blue-200',
+        rotulo: 'Aprovada • NF emitida',
+        estilo: 'bg-teal-50 text-teal-800 ring-teal-200',
       }
     case 'DEVOLVIDA':
       return {
@@ -53,26 +51,17 @@ function obterBadgeStatus(status: string, level: number) {
   }
 }
 
-export function TabelaMedicoes({ medicoes }: TabelaMedicoesProps) {
+const dois = (n: number) => n.toString().padStart(2, '0')
+
+export function TabelaMedicoes({ medicoes, envios }: TabelaMedicoesProps) {
   const [busca, setBusca] = useState('')
   const [abaAtiva, setAbaAtiva] = useState<AbaFiltro>('EM_ANALISE')
 
-  const emAnaliseCount = useMemo(
-    () => medicoes.filter((m) => m.status === 'EM_ANALISE').length,
-    [medicoes],
-  )
-  const aprovadasCount = useMemo(
-    () =>
-      medicoes.filter((m) =>
-        ['APROVADA', 'NF_ENVIADA', 'NF_APROVADA', 'PAGA'].includes(m.status),
-      ).length,
-    [medicoes],
-  )
-  const devolvidasCount = useMemo(
-    () => medicoes.filter((m) => m.status === 'DEVOLVIDA').length,
-    [medicoes],
-  )
-  const todasCount = medicoes.length
+  const pendentesEnvio = useMemo(() => envios.filter((e) => !e.sent), [envios])
+  const emAnaliseCount = medicoes.filter((m) => m.status === 'EM_ANALISE').length
+  const devolvidasCount = medicoes.filter((m) => m.status === 'DEVOLVIDA').length
+  const aprovadasCount = medicoes.filter((m) => APROVADAS.includes(m.status)).length
+  const pendentesNfCount = medicoes.filter((m) => m.status === 'APROVADA').length
 
   const filtradas = useMemo(() => {
     let base = medicoes
@@ -80,11 +69,11 @@ export function TabelaMedicoes({ medicoes }: TabelaMedicoesProps) {
     if (abaAtiva === 'EM_ANALISE') {
       base = base.filter((m) => m.status === 'EM_ANALISE')
     } else if (abaAtiva === 'APROVADAS') {
-      base = base.filter((m) =>
-        ['APROVADA', 'NF_ENVIADA', 'NF_APROVADA', 'PAGA'].includes(m.status),
-      )
+      base = base.filter((m) => APROVADAS.includes(m.status))
     } else if (abaAtiva === 'DEVOLVIDAS') {
       base = base.filter((m) => m.status === 'DEVOLVIDA')
+    } else if (abaAtiva === 'PENDENTES_NF') {
+      base = base.filter((m) => m.status === 'APROVADA')
     }
 
     const termo = busca.trim().toLowerCase()
@@ -99,91 +88,66 @@ export function TabelaMedicoes({ medicoes }: TabelaMedicoesProps) {
     )
   }, [medicoes, abaAtiva, busca])
 
+  const enviosFiltrados = useMemo(() => {
+    const termo = busca.trim().toLowerCase()
+    if (!termo) return pendentesEnvio
+    return pendentesEnvio.filter(
+      (e) =>
+        e.contractorName.toLowerCase().includes(termo) ||
+        e.projectName.toLowerCase().includes(termo) ||
+        e.contractNumber.toLowerCase().includes(termo),
+    )
+  }, [pendentesEnvio, busca])
+
+  const cards: { aba: AbaFiltro; icone: typeof Clock3; titulo: string; valor: string; nota: string }[] = [
+    {
+      aba: 'PENDENTES_ENVIO',
+      icone: Send,
+      titulo: 'Pendentes de enviar medição',
+      valor: dois(pendentesEnvio.length),
+      nota: `de ${envios.length} empreiteiro${envios.length === 1 ? '' : 's'}`,
+    },
+    { aba: 'EM_ANALISE', icone: Clock3, titulo: 'Aguardando aprovação', valor: dois(emAnaliseCount), nota: 'Para conferir' },
+    { aba: 'DEVOLVIDAS', icone: Undo2, titulo: 'Devolvidas', valor: dois(devolvidasCount), nota: 'Aguardando correção' },
+    { aba: 'APROVADAS', icone: ClipboardCheck, titulo: 'Aprovadas', valor: dois(aprovadasCount), nota: 'Cadeia concluída' },
+    {
+      aba: 'PENDENTES_NF',
+      icone: FileWarning,
+      titulo: 'Pendentes de emitir NF',
+      valor: dois(pendentesNfCount),
+      nota: `de ${aprovadasCount} aprovada${aprovadasCount === 1 ? '' : 's'}`,
+    },
+  ]
+
   return (
     <div className="space-y-4">
-      <div className="office-stats" aria-label="Resumo das medições">
-        <div><Clock3 size={20} aria-hidden="true" /><span>Aguardando análise<strong>{emAnaliseCount.toString().padStart(2, '0')}</strong></span><small>Para conferir</small></div>
-        <div><ClipboardCheck size={20} aria-hidden="true" /><span>Aprovadas / Pagas<strong>{aprovadasCount.toString().padStart(2, '0')}</strong></span><small>Etapas concluídas</small></div>
-        <div><Undo2 size={20} aria-hidden="true" /><span>Devolvidas<strong>{devolvidasCount.toString().padStart(2, '0')}</strong></span><small>Aguardando correção</small></div>
+      <div className="office-stats" role="tablist" aria-label="Resumo das medições">
+        {cards.map(({ aba, icone: Icone, titulo, valor, nota }) => (
+          <button
+            key={aba}
+            type="button"
+            role="tab"
+            aria-selected={abaAtiva === aba}
+            data-testid={`card-resumo-${aba}`}
+            onClick={() => setAbaAtiva(aba)}
+            className={abaAtiva === aba ? 'ativo' : ''}
+          >
+            <Icone size={20} aria-hidden="true" />
+            <span>{titulo}<strong>{valor}</strong></span>
+            <small>{nota}</small>
+          </button>
+        ))}
       </div>
-      {/* Abas por Status */}
-      <div className="status-tabs flex flex-wrap border-b border-slate-200 text-xs font-semibold">
-        <button
-          type="button"
-          onClick={() => setAbaAtiva('EM_ANALISE')}
-          className={`flex items-center gap-1.5 border-b-2 px-3 py-2.5 transition ${
-            abaAtiva === 'EM_ANALISE'
-              ? 'border-slate-900 text-slate-900'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          Em Análise
-          <span
-            className={`rounded-full px-1.5 py-0.2 text-[10px] ${
-              abaAtiva === 'EM_ANALISE'
-                ? 'bg-amber-100 text-amber-900'
-                : 'bg-slate-100 text-slate-600'
-            }`}
-          >
-            {emAnaliseCount}
-          </span>
-        </button>
 
-        <button
-          type="button"
-          onClick={() => setAbaAtiva('APROVADAS')}
-          className={`flex items-center gap-1.5 border-b-2 px-3 py-2.5 transition ${
-            abaAtiva === 'APROVADAS'
-              ? 'border-slate-900 text-slate-900'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          Aprovadas / Pagas
-          <span
-            className={`rounded-full px-1.5 py-0.2 text-[10px] ${
-              abaAtiva === 'APROVADAS'
-                ? 'bg-emerald-100 text-emerald-900'
-                : 'bg-slate-100 text-slate-600'
-            }`}
-          >
-            {aprovadasCount}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setAbaAtiva('DEVOLVIDAS')}
-          className={`flex items-center gap-1.5 border-b-2 px-3 py-2.5 transition ${
-            abaAtiva === 'DEVOLVIDAS'
-              ? 'border-slate-900 text-slate-900'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          Devolvidas
-          <span
-            className={`rounded-full px-1.5 py-0.2 text-[10px] ${
-              abaAtiva === 'DEVOLVIDAS'
-                ? 'bg-rose-100 text-rose-900'
-                : 'bg-slate-100 text-slate-600'
-            }`}
-          >
-            {devolvidasCount}
-          </span>
-        </button>
-
+      <div className="flex justify-end">
         <button
           type="button"
           onClick={() => setAbaAtiva('TODAS')}
-          className={`flex items-center gap-1.5 border-b-2 px-3 py-2.5 transition ${
-            abaAtiva === 'TODAS'
-              ? 'border-slate-900 text-slate-900'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+          className={`text-xs font-semibold underline-offset-4 ${
+            abaAtiva === 'TODAS' ? 'text-slate-900 underline' : 'text-slate-500 hover:text-slate-900 hover:underline'
           }`}
         >
-          Todas
-          <span className="rounded-full bg-slate-100 px-1.5 py-0.2 text-[10px] text-slate-600">
-            {todasCount}
-          </span>
+          Ver todas as medições ({medicoes.length})
         </button>
       </div>
 
@@ -203,7 +167,9 @@ export function TabelaMedicoes({ medicoes }: TabelaMedicoesProps) {
         </span>
       </div>
 
-      {filtradas.length === 0 ? (
+      {abaAtiva === 'PENDENTES_ENVIO' ? (
+        <ListaPendentesEnvio pendentes={enviosFiltrados} total={envios.length} />
+      ) : filtradas.length === 0 ? (
         <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
           <p className="text-sm font-medium text-slate-600">
             {busca

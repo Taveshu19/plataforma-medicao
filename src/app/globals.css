@@ -564,12 +564,17 @@ select {
 }
 .office-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
   padding-bottom: 18px;
 }
-.office-stats > div {
+.office-stats > button {
   position: relative;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: border-color 0.15s, background 0.15s;
   display: flex;
   align-items: flex-start;
   gap: 16px;
@@ -578,7 +583,10 @@ select {
   border: 1px solid #dce2d8;
   border-radius: 14px;
 }
-.office-stats > div:first-child {
+.office-stats > button:hover {
+  border-color: #153e30;
+}
+.office-stats > button.ativo {
   background: #153e30;
   color: #d7ef9c;
   border-color: #153e30;
@@ -617,12 +625,17 @@ select {
 .document-sheet {
   border-top: 4px solid #153e30;
 }
+@media (max-width: 1180px) {
+  .office-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 @media (max-width: 700px) {
   .office-stats {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  .office-stats > div {
+  .office-stats > button {
     padding: 16px;
   }
   .office-stats strong {

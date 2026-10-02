@@ -50,7 +50,7 @@ test.describe('fluxo de contrato, espelho e auditoria', () => {
     await expect(page).toHaveURL('/analise')
 
     // 2. Confere abas de status
-    await expect(page.getByRole('button', { name: /Em Análise/ })).toBeVisible()
+    await expect(page.getByRole('tab', { name: /Aguardando aprovação/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Aprovadas/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Devolvidas/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Todas/ })).toBeVisible()

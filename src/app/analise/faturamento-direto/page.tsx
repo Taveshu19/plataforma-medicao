@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Marca } from '@/components/Marca'
-import { obterPerfilUsuario } from '@/lib/aprovacao/dados'
+import { obterPerfilUsuario, veFaturamentoComum } from '@/lib/aprovacao/dados'
 import { listarFaturamentosDiretos, TIPOS_FATURAMENTO } from '@/lib/faturamento-direto/dados'
 import { SeloStatusFD, dataHora } from '@/components/FaturamentoDireto'
 import { formatarReais } from '@/app/formato'
@@ -24,8 +24,12 @@ export default async function FaturamentoDiretoEngenhariaPage() {
             <Link href="/analise" className="text-slate-500 hover:text-slate-900">Aprovações</Link>
             <span className="text-slate-300">•</span>
             <span className="border-b-2 border-slate-900 pb-0.5 text-slate-900">Faturamento Direto</span>
-            <span className="text-slate-300">•</span>
-            <Link href="/faturamento" className="text-slate-500 hover:text-slate-900">Faturamento e NFs</Link>
+            {veFaturamentoComum(perfil.role) && (
+              <>
+                <span className="text-slate-300">•</span>
+                <Link href="/faturamento" className="text-slate-500 hover:text-slate-900">Faturamento e NFs</Link>
+              </>
+            )}
           </nav>
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">Faturamento Direto</h1>
           <p className="text-xs text-slate-500">

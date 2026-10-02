@@ -20,8 +20,7 @@ export default async function Home() {
   const contexto = await carregarContexto()
   if (!contexto) redirect('/entrar')
 
-  const { nome, obra, contratoNumero, descricao, resumo, periodo, trilha, protocoloAtual } =
-    contexto
+  const { nome, obra, contratoNumero, descricao, resumo, periodo, trilhas } = contexto
   const avisosNaoLidos = await contarNaoLidos()
 
   // Medições com aprovação final da cadeia: faturamento liberado, falta a NF.
@@ -130,7 +129,9 @@ export default async function Home() {
         <ActionLink href="/faturamento-direto" icon={Receipt}>Faturamento Direto</ActionLink>
         <ActionLink href="/contrato" icon={FileText}>Meu contrato</ActionLink>
       </nav>
-      <TrilhaStatus passos={trilha} protocolo={protocoloAtual} />
+      {trilhas.map((t, i) => (
+        <TrilhaStatus key={t.protocolo ?? i} passos={t.passos} protocolo={t.protocolo} />
+      ))}
       </div></div>
     </main></>
   )

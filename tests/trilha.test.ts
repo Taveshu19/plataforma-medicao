@@ -92,17 +92,18 @@ describe('trilha de status da medição', () => {
     expect(estados(t).slice(1).every((e) => e === 'pendente')).toBe(true)
   })
 
-  it('aprovada: todas as aprovações concluídas e a liberação para NF é o passo atual', () => {
+  it('aprovada: faturamento liberado fica verde e a nota fiscal é o passo atual', () => {
     const t = montarTrilha(progresso('APROVADA', 3), NIVEIS)
     expect(estados(t)).toEqual([
       'concluido',
       'concluido',
       'concluido',
       'concluido',
-      'atual', // Liberado para NF
-      'pendente',
+      'concluido', // Faturamento liberado
+      'atual', // Nota fiscal
       'pendente',
     ])
+    expect(t[5].detalhe).toBe('Envie a nota fiscal desta medição.')
   })
 
   it('NF enviada: a liberação fica para trás e a nota é o passo atual', () => {

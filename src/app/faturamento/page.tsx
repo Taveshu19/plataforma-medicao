@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Marca } from '@/components/Marca'
 import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/server'
-import { obterPerfilUsuario } from '@/lib/aprovacao/dados'
+import { obterPerfilUsuario, veFaturamentoComum } from '@/lib/aprovacao/dados'
 import { listarNotasPendentes } from '@/lib/faturamento/dados'
 import { TabelaFaturamento } from './components/TabelaFaturamento'
 import { TabelaFaturamentoDireto } from './components/TabelaFaturamentoDireto'
@@ -23,6 +23,11 @@ export default async function PainelFaturamentoPage() {
   // Se não for membro da construtora, vai para a home do empreiteiro
   if (!perfil || !perfil.isConstrutora) {
     redirect('/')
+  }
+
+  // Faturamento comum é do Administrativo; a engenharia fica nas aprovações.
+  if (!veFaturamentoComum(perfil.role)) {
+    redirect('/analise')
   }
 
   const notas = await listarNotasPendentes()

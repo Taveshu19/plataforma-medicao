@@ -267,3 +267,45 @@ export async function listarMedicoesPorStatus(
   }))
 }
 
+
+export interface EnvioMedicaoContrato {
+  contractId: string
+  contractNumber: string
+  contractorName: string
+  projectName: string
+  competence: string
+  closesAt: string
+  periodOpen: boolean
+  sent: boolean
+  measurementStatus: string | null
+}
+
+/**
+ * Situação de envio da medição da competência atual, por contrato, nas obras
+ * que o usuário da construtora acompanha. Base do card "Pendentes de enviar medição".
+ */
+export async function listarSituacaoEnvioMedicao(): Promise<EnvioMedicaoContrato[]> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase.rpc('get_measurement_submission_status')
+  if (error || !data) return []
+
+  return data.map((r) => ({
+    contractId: r.contract_id,
+    contractNumber: r.contract_number,
+    contractorName: r.contractor_name,
+    projectName: r.project_name,
+    competence: r.competence,
+    closesAt: r.closes_at,
+    periodOpen: r.period_open,
+    sent: r.sent,
+    measurementStatus: r.measurement_status,
+  }))
+}
+
+/**
+ * A aba "Faturamento e NFs" é do Administrativo. A engenharia (e a coordenação)
+ * acompanha só as aprovações e o Faturamento Direto.
+ */
+export function veFaturamentoComum(role: string): boolean {
+  return ['gerencia', 'financeiro', 'admin'].includes(role)
+}

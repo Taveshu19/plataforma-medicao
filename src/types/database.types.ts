@@ -1240,6 +1240,23 @@ export type Database = {
         }[]
       }
       get_direct_billing: { Args: { p_id: string }; Returns: Json }
+      get_measurement_submission_status: {
+        Args: never
+        Returns: {
+          closes_at: string
+          competence: string
+          contract_id: string
+          contract_number: string
+          contractor_id: string
+          contractor_name: string
+          measurement_id: string | null
+          measurement_status: Database["public"]["Enums"]["measurement_status"] | null
+          period_open: boolean
+          project_id: string
+          project_name: string
+          sent: boolean
+        }[]
+      }
       list_direct_billings: {
         Args: {
           p_statuses?: Database["public"]["Enums"]["direct_billing_status"][]
