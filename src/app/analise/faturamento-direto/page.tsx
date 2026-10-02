@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Marca } from '@/components/Marca'
-import { obterPerfilUsuario, veFaturamentoComum } from '@/lib/aprovacao/dados'
+import { obterPerfilUsuario } from '@/lib/aprovacao/dados'
+import { contarNaoLidos } from '@/lib/notificacoes/dados'
+import { CabecalhoCentral } from '../components/CabecalhoCentral'
 import { listarFaturamentosDiretos, TIPOS_FATURAMENTO } from '@/lib/faturamento-direto/dados'
 import { SeloStatusFD, dataHora } from '@/components/FaturamentoDireto'
 import { formatarReais } from '@/app/formato'
@@ -11,31 +12,23 @@ export default async function FaturamentoDiretoEngenhariaPage() {
   if (!perfil) redirect('/entrar')
   if (!perfil.isConstrutora) redirect('/')
 
-  const todos = await listarFaturamentosDiretos()
+  const [todos, avisosNaoLidos] = await Promise.all([listarFaturamentosDiretos(), contarNaoLidos()])
   const pendentes = todos.filter((f) => f.status === 'AGUARDANDO_ENGENHARIA')
   const demais = todos.filter((f) => f.status !== 'AGUARDANDO_ENGENHARIA')
 
   return (
-    <>
-      <div className="product-bar"><div className="product-bar-inner"><Marca /><span className="product-bar-caption">Gestão da construtora</span></div></div>
-      <main className="office-workspace mx-auto w-full px-5 pb-16 pt-8">
-        <header className="border-b border-slate-200 pb-6">
-          <nav className="flex items-center gap-2 text-xs font-semibold">
-            <Link href="/analise" className="text-slate-500 hover:text-slate-900">Aprovações</Link>
-            <span className="text-slate-300">•</span>
-            <span className="border-b-2 border-slate-900 pb-0.5 text-slate-900">Faturamento Direto</span>
-            {veFaturamentoComum(perfil.role) && (
-              <>
-                <span className="text-slate-300">•</span>
-                <Link href="/faturamento" className="text-slate-500 hover:text-slate-900">Faturamento e NFs</Link>
-              </>
-            )}
-          </nav>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">Faturamento Direto</h1>
-          <p className="text-xs text-slate-500">
-            NFs de material e outros faturamentos sem medição. Aprovação só da Engenharia; aprovado, segue direto ao Administrativo.
-          </p>
-        </header>
+    <main className="central-workspace mx-auto w-full px-5 pb-16 pt-6">
+        <CabecalhoCentral
+          nome={perfil.nome}
+          role={perfil.role}
+          competencia={null}
+          avisosNaoLidos={avisosNaoLidos}
+          ativo="faturamento-direto"
+          fdPendentes={pendentes.length}
+        />
+        <p className="text-sm text-slate-500">
+          NFs de material e outros faturamentos sem medição. Aprovação só da Engenharia; aprovado, segue direto ao Administrativo.
+        </p>
 
         <section className="mt-6">
           <h2 className="text-sm font-bold text-slate-900">Aguardando Engenharia ({pendentes.length})</h2>
@@ -46,8 +39,7 @@ export default async function FaturamentoDiretoEngenhariaPage() {
           <h2 className="text-sm font-bold text-slate-900">Já analisados</h2>
           <Tabela itens={demais} vazio="Nada por aqui ainda." />
         </section>
-      </main>
-    </>
+    </main>
   )
 }
 

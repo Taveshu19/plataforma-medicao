@@ -1239,6 +1239,7 @@ export type Database = {
           notes: string | null
         }[]
       }
+      cobrar_envio_medicao: { Args: { p_contract_id: string }; Returns: number }
       get_direct_billing: { Args: { p_id: string }; Returns: Json }
       get_measurement_submission_status: {
         Args: never

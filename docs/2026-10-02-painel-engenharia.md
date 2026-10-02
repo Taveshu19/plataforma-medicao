@@ -17,3 +17,9 @@ Fonte: pedido do Gustavo, 02/10/2026.
 - Migração `030_pendentes_envio_medicao.sql` (`get_measurement_submission_status`) aplicada no banco da nuvem; teste com rollback: empreiteiro não vê nada; contrato em rascunho aparece como pendente.
 - Testes de unidade (trilha, contexto e outros) 41/41; `next build` ok; telas conferidas no build local ligado ao banco da nuvem.
 - E2E antigos ajustados aos novos textos, não rodados (precisam do banco local).
+
+## Atualização 02/10 — tela "Central de Controle" (modelo enviado pelo Pedro)
+- `/analise` virou "Central de Controle": sino de avisos, menu do usuário (prazos, avisos, sair), seletor **Medições | Faturamento Direto** (Gerência/Financeiro/Admin veem também "Faturamento e NFs").
+- Cards coloridos (Pendentes de envio, Aguardando aprovação, Devolvidas, Aprovadas, Pendentes de NF), "Resumo do mês", filtros em pílula e lista com título e contagem.
+- Lista de pendentes com "Não enviada"/"Em rascunho", prazo, botão **Cobrar envio** (avisa o empreiteiro; migração `031_cobrar_envio_medicao.sql`, testada com rollback: engenharia cobra, empreiteiro não) e menu "⋮" com "Ver medições deste empreiteiro".
+- Saiu a barra de busca (não está no modelo). A tela abre em "Pendentes" quando há pendência; senão em "Em análise".

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { ClipboardCheck, Clock3, FileWarning, Send, Undo2 } from 'lucide-react'
+import { ChartColumn, ChevronRight, CircleCheck, Clock3, FileText, FileWarning, Undo2 } from 'lucide-react'
 import { Badge } from '@/components/ui'
 import Link from 'next/link'
 import type { EnvioMedicaoContrato, MedicaoPendente } from '@/lib/aprovacao/dados'
@@ -51,11 +51,12 @@ function obterBadgeStatus(status: string, level: number) {
   }
 }
 
-const dois = (n: number) => n.toString().padStart(2, '0')
-
 export function TabelaMedicoes({ medicoes, envios }: TabelaMedicoesProps) {
   const [busca, setBusca] = useState('')
-  const [abaAtiva, setAbaAtiva] = useState<AbaFiltro>('EM_ANALISE')
+  // Abre em "Pendentes de envio" quando há quem cobrar; senão no que espera aprovação.
+  const [abaAtiva, setAbaAtiva] = useState<AbaFiltro>(() =>
+    envios.some((e) => !e.sent) ? 'PENDENTES_ENVIO' : 'EM_ANALISE',
+  )
 
   const pendentesEnvio = useMemo(() => envios.filter((e) => !e.sent), [envios])
   const emAnaliseCount = medicoes.filter((m) => m.status === 'EM_ANALISE').length
@@ -99,82 +100,111 @@ export function TabelaMedicoes({ medicoes, envios }: TabelaMedicoesProps) {
     )
   }, [pendentesEnvio, busca])
 
-  const cards: { aba: AbaFiltro; icone: typeof Clock3; titulo: string; valor: string; nota: string }[] = [
-    {
-      aba: 'PENDENTES_ENVIO',
-      icone: Send,
-      titulo: 'Pendentes de enviar medição',
-      valor: dois(pendentesEnvio.length),
-      nota: `de ${envios.length} empreiteiro${envios.length === 1 ? '' : 's'}`,
-    },
-    { aba: 'EM_ANALISE', icone: Clock3, titulo: 'Aguardando aprovação', valor: dois(emAnaliseCount), nota: 'Para conferir' },
-    { aba: 'DEVOLVIDAS', icone: Undo2, titulo: 'Devolvidas', valor: dois(devolvidasCount), nota: 'Aguardando correção' },
-    { aba: 'APROVADAS', icone: ClipboardCheck, titulo: 'Aprovadas', valor: dois(aprovadasCount), nota: 'Cadeia concluída' },
-    {
-      aba: 'PENDENTES_NF',
-      icone: FileWarning,
-      titulo: 'Pendentes de emitir NF',
-      valor: dois(pendentesNfCount),
-      nota: `de ${aprovadasCount} aprovada${aprovadasCount === 1 ? '' : 's'}`,
-    },
+  const cards: { aba: AbaFiltro; icone: typeof Clock3; titulo: string; valor: number; cor: string }[] = [
+    { aba: 'PENDENTES_ENVIO', icone: FileWarning, titulo: 'Pendentes de envio', valor: pendentesEnvio.length, cor: 'laranja' },
+    { aba: 'EM_ANALISE', icone: Clock3, titulo: 'Aguardando aprovação', valor: emAnaliseCount, cor: 'ambar' },
+    { aba: 'DEVOLVIDAS', icone: Undo2, titulo: 'Devolvidas', valor: devolvidasCount, cor: 'rosa' },
+    { aba: 'APROVADAS', icone: CircleCheck, titulo: 'Aprovadas', valor: aprovadasCount, cor: 'verde' },
+    { aba: 'PENDENTES_NF', icone: FileText, titulo: 'Pendentes de NF', valor: pendentesNfCount, cor: 'azul' },
   ]
+
+  const chips: { aba: AbaFiltro; rotulo: string; valor: number }[] = [
+    { aba: 'PENDENTES_ENVIO', rotulo: 'Pendentes', valor: pendentesEnvio.length },
+    { aba: 'EM_ANALISE', rotulo: 'Em análise', valor: emAnaliseCount },
+    { aba: 'DEVOLVIDAS', rotulo: 'Devolvidas', valor: devolvidasCount },
+    { aba: 'APROVADAS', rotulo: 'Aprovadas', valor: aprovadasCount },
+    { aba: 'PENDENTES_NF', rotulo: 'NF pendente', valor: pendentesNfCount },
+  ]
+
+  const TITULO_LISTA: Record<AbaFiltro, string> = {
+    PENDENTES_ENVIO: 'Pendentes de envio',
+    EM_ANALISE: 'Aguardando aprovação',
+    DEVOLVIDAS: 'Devolvidas',
+    APROVADAS: 'Aprovadas',
+    PENDENTES_NF: 'Pendentes de NF',
+    TODAS: 'Todas as medições',
+  }
+
+  const contagemLista =
+    abaAtiva === 'PENDENTES_ENVIO'
+      ? `${enviosFiltrados.length} empreiteiro${enviosFiltrados.length === 1 ? '' : 's'}`
+      : `${filtradas.length} medi${filtradas.length === 1 ? 'ção' : 'ções'}`
+
+  const selecionar = (aba: AbaFiltro) => {
+    setBusca('')
+    setAbaAtiva(aba)
+    document.getElementById('lista-central')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   return (
     <div className="space-y-4">
-      <div className="office-stats" role="tablist" aria-label="Resumo das medições">
-        {cards.map(({ aba, icone: Icone, titulo, valor, nota }) => (
+      <div className="central-cards" aria-label="Resumo das medições">
+        {cards.map(({ aba, icone: Icone, titulo, valor, cor }) => (
+          <button
+            key={aba}
+            type="button"
+            data-testid={`card-resumo-${aba}`}
+            aria-pressed={abaAtiva === aba}
+            onClick={() => selecionar(aba)}
+            className={`central-card central-card-${cor}`}
+          >
+            <span className="central-card-icone"><Icone size={26} aria-hidden="true" /></span>
+            <span className="central-card-texto">
+              <span>{titulo}</span>
+              <strong>{valor}</strong>
+            </span>
+            <ChevronRight size={22} aria-hidden="true" className="central-card-seta" />
+          </button>
+        ))}
+      </div>
+
+      <div className="central-resumo">
+        <ChartColumn size={22} aria-hidden="true" />
+        <p>
+          <span className="font-semibold">Resumo do mês:</span>{' '}
+          <strong>{pendentesEnvio.length}</strong> empreiteiro{pendentesEnvio.length === 1 ? '' : 's'} sem medição
+          <span className="mx-2 text-slate-400">•</span>
+          <strong>{pendentesNfCount}</strong> aprovaç{pendentesNfCount === 1 ? 'ão' : 'ões'} sem NF
+        </p>
+      </div>
+
+      <div className="central-chips" role="tablist" aria-label="Filtrar lista">
+        {chips.map(({ aba, rotulo, valor }) => (
           <button
             key={aba}
             type="button"
             role="tab"
             aria-selected={abaAtiva === aba}
-            data-testid={`card-resumo-${aba}`}
-            onClick={() => setAbaAtiva(aba)}
-            className={abaAtiva === aba ? 'ativo' : ''}
+            onClick={() => {
+              setBusca('')
+              setAbaAtiva(aba)
+            }}
           >
-            <Icone size={20} aria-hidden="true" />
-            <span>{titulo}<strong>{valor}</strong></span>
-            <small>{nota}</small>
+            {rotulo} ({valor})
           </button>
         ))}
       </div>
 
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => setAbaAtiva('TODAS')}
-          className={`text-xs font-semibold underline-offset-4 ${
-            abaAtiva === 'TODAS' ? 'text-slate-900 underline' : 'text-slate-500 hover:text-slate-900 hover:underline'
-          }`}
-        >
-          Ver todas as medições ({medicoes.length})
-        </button>
-      </div>
-
-      {/* Barra de busca */}
-      <div className="relative">
-        <input
-          type="search"
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar por protocolo, empreiteiro ou obra..."
-          className="w-full rounded-xl border-0 bg-white px-4 py-3 pl-10 text-sm text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-slate-900"
-        />
-        <span className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-slate-400">
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+      <div id="lista-central" className="central-lista-topo">
+        <h2>{busca ? `Histórico • ${busca}` : TITULO_LISTA[abaAtiva]}</h2>
+        <span>
+          {contagemLista}
+          {busca && (
+            <button type="button" onClick={() => selecionar('PENDENTES_ENVIO')} className="ml-3 font-semibold text-slate-900 underline underline-offset-4">
+              Limpar
+            </button>
+          )}
         </span>
       </div>
 
       {abaAtiva === 'PENDENTES_ENVIO' ? (
-        <ListaPendentesEnvio pendentes={enviosFiltrados} total={envios.length} />
+        <ListaPendentesEnvio pendentes={enviosFiltrados} total={envios.length} onVerHistorico={(nome) => { setBusca(nome); setAbaAtiva('TODAS') }} />
       ) : filtradas.length === 0 ? (
         <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
           <p className="text-sm font-medium text-slate-600">
             {busca
               ? `Nenhuma medição encontrada para "${busca}".`
-              : 'Nenhuma medição encontrada nesta categoria.'}
+              : 'Nenhuma medição nesta categoria.'}
           </p>
         </div>
       ) : (

@@ -140,3 +140,15 @@ export async function cancelarMedicao(
   revalidatePath('/')
   return { success: true }
 }
+
+/**
+ * Engenharia cobra o empreiteiro que ainda não enviou a medição da
+ * competência atual: vira um aviso na tela do empreiteiro.
+ */
+export async function cobrarEnvioMedicao(contractId: string): Promise<AcaoResultado> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase.rpc('cobrar_envio_medicao', { p_contract_id: contractId })
+  if (error) return { success: false, error: error.message }
+  if (!data) return { success: false, error: 'O empreiteiro não tem usuário cadastrado para receber o aviso.' }
+  return { success: true }
+}

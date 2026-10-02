@@ -47,7 +47,7 @@ test.describe('ciclo completo empreiteiro x engenharia (ajuste, devolucao e apro
     await page.getByRole('button', { name: 'Entrar' }).click()
 
     await expect(page).toHaveURL('/analise')
-    await expect(page.getByRole('heading', { name: 'Painel de Aprovações' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Central de Controle' })).toBeVisible()
     await expect(page.getByText(protocolo)).toBeVisible()
 
     // 3. Entra nos detalhes da medição

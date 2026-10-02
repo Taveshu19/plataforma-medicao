@@ -18,6 +18,7 @@ const ICONE: Record<string, { cor: string; icon: LucideIcon }> = {
   FD_RECEBIDO: { cor: 'bg-slate-200 text-slate-700', icon: FileText },
   FD_APROVADO: { cor: 'bg-emerald-100 text-emerald-700', icon: Check },
   FD_DEVOLVIDO: { cor: 'bg-rose-100 text-rose-700', icon: Undo2 },
+  COBRANCA_ENVIO: { cor: 'bg-amber-100 text-amber-700', icon: Clock3 },
 }
 
 function quando(iso: string): string {
