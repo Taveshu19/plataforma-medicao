@@ -3,7 +3,7 @@ tipo: construir
 status: feito
 quem: Gustavo
 prioridade: 2
-linear:
+linear: GUS-78
 origem: pedido do Gustavo — ajustes interface engenharia
 atualizado: 2026-10-02
 ---
