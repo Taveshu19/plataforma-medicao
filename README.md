@@ -1,48 +1,60 @@
 # Plataforma de Medição de Empreiteiros
 
-Sistema web que padroniza a medição mensal entre construtora e empreiteiro. Hoje cada empreiteiro apresenta a medição de um jeito (Excel, WhatsApp, PDF) e a engenharia acaba montando a planilha por ele. Aqui o ciclo inteiro fica num lugar só:
+Esse projeto nasceu de uma conversa com o Pedro, que trabalha com obras. Todo mês cada empreiteiro manda a medição de um jeito: planilha, foto no WhatsApp, PDF, ou nem manda, e alguém da engenharia acaba montando a planilha por ele. Depois disso a aprovação acontece por mensagem e não fica registro de nada.
+
+A ideia é simples: um lugar só para o ciclo inteiro.
 
 **Contrato → Medição → Aprovação → Nota fiscal → Histórico**
 
-Produto desenvolvido com um profissional da construção civil, que trouxe o conhecimento do domínio. MVP pronto, com dados de demonstração.
+O Pedro trouxe o conhecimento de obra e eu fiz o sistema. A primeira versão está pronta e roda com dados de demonstração.
 
-## Como funciona
+## Como funciona na prática
 
-- **Empreiteiro (celular):** vê o contrato e o saldo de cada serviço, lança a medição por local (em m² ou em %), anexa fotos e, depois da aprovação, envia a nota fiscal.
-- **Engenharia (desktop):** recebe as medições, ajusta quantidades, devolve com motivo ou aprova, em quantos níveis a obra exigir.
-- **Financeiro:** confere a nota contra o valor aprovado e registra o pagamento.
-- Tudo fica numa linha do tempo de auditoria e num espelho formal da medição para assinatura.
+O empreiteiro abre pelo celular, vê o contrato e quanto ainda falta de cada serviço, e lança o que fez no mês, por casa ou pavimento, em m² ou em porcentagem. Pode anexar fotos.
 
-## Decisões de arquitetura
+A engenharia recebe no computador, ajusta alguma quantidade se precisar, devolve com o motivo ou aprova. Uma obra pode ter um ou vários níveis de aprovação.
 
-- **Várias empresas no mesmo sistema, isoladas pelo banco.** Toda tabela carrega `company_id` e o isolamento é feito por Row Level Security do Postgres, não por filtro na aplicação: esquecer um filtro devolve zero linhas, em vez de vazar dados de outra construtora. O empreiteiro tem uma segunda política que o limita aos próprios contratos.
-- **As regras críticas moram no banco.** Saldo, subtotal e transições de status são funções Postgres. O app roda no celular do empreiteiro e poderia ser contornado; o front-end só repete a validação para dar retorno na hora.
-- **Saldo nunca é guardado, é calculado.** `contratado − aprovado − em análise`. A quantidade em análise entra na conta para o empreiteiro não medir o mesmo serviço duas vezes antes da primeira aprovação.
-- **Quantidade solicitada é imutável;** a aprovada é outra coluna. Isso dá a auditoria de graça.
-- **Percentual é modo de entrada, não unidade:** o banco guarda sempre a quantidade física.
-- **Status separado do nível de aprovação:** 8 status em vez de 15, e adicionar um nível de aprovação não exige mudar código.
+Depois de aprovado, o empreiteiro envia a nota fiscal e o financeiro confere com o valor aprovado e registra o pagamento. Tudo fica numa linha do tempo, e a medição pode ser impressa num espelho formal para assinatura.
 
-## Stack
+## Algumas decisões que tomei
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Supabase (Postgres, Auth, Storage, RLS) · Vitest · Playwright · Vercel
+**Cada construtora só enxerga os próprios dados, e quem garante isso é o banco.** Toda tabela tem a empresa dona da linha, e as regras de acesso (Row Level Security do Postgres) filtram tudo. Se algum dia eu esquecer um filtro no código, a consulta volta vazia, em vez de mostrar dados de outra empresa. O empreiteiro tem mais uma regra que o limita aos contratos dele.
 
-## Estrutura
+**As contas ficam no banco, não na tela.** O app roda no celular do empreiteiro e dá para burlar o que está só no navegador. Saldo, subtotal e mudança de status são funções no Postgres; a tela só repete a validação para avisar na hora.
 
-| Pasta | Conteúdo |
+**O saldo não fica guardado, é sempre calculado:** contratado menos aprovado menos o que está em análise. Se eu não contasse o que está em análise, o empreiteiro poderia medir os mesmos 46 m² duas vezes antes da primeira aprovação.
+
+**A quantidade que o empreiteiro pediu nunca muda.** A que a engenharia aprovou fica em outra coluna. Com isso a auditoria sai de graça.
+
+**Porcentagem é só um jeito de digitar.** O banco guarda sempre a quantidade real (10% de 200 m² vira 20 m²), e as regras não precisam de caso especial.
+
+**Nível de aprovação não é status.** Em vez de um status para cada etapa ("aguardando coordenação", "aguardando gerência"), uso um status "em análise" mais o nível atual. Assim dá para configurar uma obra com dois ou cinco níveis sem mexer no código.
+
+## Tecnologias
+
+Next.js 16, React 19, TypeScript, Tailwind CSS 4, Supabase (Postgres, Auth, Storage), Vitest, Playwright e Vercel.
+
+## Onde está cada coisa
+
+| Pasta | O que tem |
 |---|---|
-| `src/app/` | Rotas do empreiteiro (`medicao`, `contrato`, `medicoes`), da engenharia (`analise`, `painel`) e do financeiro (`faturamento`) |
-| `supabase/migrations/` | 31 migrações: empresas e vínculos, contratos, saldo, máquina de estados, auditoria, reabertura, anexos, faturamento |
-| `tests/` | Testes de regra e de fluxo com Vitest (mais de 30 arquivos) |
-| `e2e/` | Fluxos completos no navegador com Playwright: login, medição, aprovação, faturamento |
-| `docs/superpowers/` | Especificação e planos de implementação, escritos antes do código |
+| `src/app/` | As telas do empreiteiro (`medicao`, `contrato`, `medicoes`), da engenharia (`analise`, `painel`) e do financeiro (`faturamento`) |
+| `supabase/migrations/` | As 31 migrações do banco, na ordem em que o sistema foi crescendo |
+| `tests/` | Testes das regras e dos fluxos (Vitest) |
+| `e2e/` | Testes no navegador do começo ao fim: login, medição, aprovação e faturamento (Playwright) |
+| `docs/superpowers/` | A especificação e os planos, escritos antes do código |
 
-## Rodar localmente
+## Para rodar
 
 ```bash
 npm install
-npx supabase start      # Postgres local com as migrações
+npx supabase start      # sobe o Postgres local com as migrações
 npm run db:reset        # recria o banco com os dados de demonstração
 npm run dev
 npm test                # testes de regra
 npm run e2e             # testes de ponta a ponta
 ```
+
+## Como foi feito
+
+Desenvolvi com agentes de IA (Claude Code e Codex) orquestrados pelo terminal. Cada etapa começou por uma especificação escrita (está em `docs/superpowers/`), virou um plano de tarefas, e cada tarefa foi implementada, testada e revisada antes de seguir. Os arquivos `CLAUDE.md` e `AGENTS.md` são as instruções que os agentes seguem neste projeto.
