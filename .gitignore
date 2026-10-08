@@ -53,3 +53,7 @@ next-env.d.ts
 
 # diretorio de trabalho dos agentes
 .superpowers/
+
+# arquivos pessoais de contato com o Pedro (ficam so na maquina)
+ACESSO_PEDRO.md
+MENSAGEM_WHATSAPP_PEDRO.txt
